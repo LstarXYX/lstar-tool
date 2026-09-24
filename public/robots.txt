@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lstarxyx.github.io/lstar-tool/sitemap.xml

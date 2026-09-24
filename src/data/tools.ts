@@ -19,7 +19,7 @@ export const tools: ToolDefinition[] = [
     category: '图片处理',
     available: true,
   },
-  { id: 'json', name: 'JSON 格式化', description: '整理、校验和美化 JSON 数据', icon: Braces, category: '开发辅助', available: false },
+  { id: 'json', name: 'JSON 格式化', description: '整理、校验、编辑与查看 JSON 结构', icon: Braces, category: '开发辅助', available: true },
   { id: 'qrcode', name: '二维码工具', description: '生成及解析常用二维码', icon: QrCode, category: '效率工具', available: false },
   { id: 'color', name: '颜色转换', description: '在 HEX、RGB 与 HSL 间切换', icon: Palette, category: '图片处理', available: false },
 ]

@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Box, CheckCircle2, ChevronLeft, ChevronRight, Code2, Heart, LockKeyhole, Search, Sparkles } from 'lucide-react'
 import { tools, type ToolDefinition } from './data/tools'
 import { ImageBase64Tool } from './features/image-base64/ImageBase64Tool'
+import { JsonFormatterTool } from './features/json-formatter/JsonFormatterTool'
 
-type View = 'home' | 'toolbox' | 'image-base64'
+type View = 'home' | 'toolbox' | 'image-base64' | 'json'
 type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
 const categories: Category[] = ['全部', '图片处理', '开发辅助', '效率工具', '我的收藏']
@@ -33,10 +34,13 @@ function App() {
   const carouselRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { localStorage.setItem(favouritesKey, JSON.stringify(favourites)) }, [favourites])
+  useEffect(() => {
+    document.title = view === 'json' ? 'JSON 格式化工具 · Lstar Tools' : view === 'image-base64' ? '图片与 Base64 互转 · Lstar Tools' : view === 'toolbox' ? '工具箱 · Lstar Tools' : 'Lstar Tools · 轻巧的开发工具箱'
+  }, [view])
 
   const openTool = (id: string) => {
-    if (id === 'image-base64') {
-      setView('image-base64')
+    if (id === 'image-base64' || id === 'json') {
+      setView(id)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -60,6 +64,7 @@ function App() {
 
       <main>
         {view === 'image-base64' && <ImageBase64Tool onBack={showToolbox} />}
+        {view === 'json' && <JsonFormatterTool onBack={showToolbox} />}
         {view === 'home' && <>
           <section className="hero">
             <div className="hero-copy"><span className="hero-badge"><Sparkles size={14} />为开发者而生</span><h1>简单工具，<br /><em>专注创造。</em></h1><p>一组快速、可靠且尊重隐私的在线小工具。没有冗余步骤，帮你把时间留给真正重要的工作。</p><button className="hero-button" type="button" onClick={showToolbox}>探索工具 <ArrowRight size={18} /></button></div>
