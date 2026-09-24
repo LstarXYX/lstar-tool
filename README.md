@@ -8,13 +8,14 @@
 
 - [**图片 / Base64 互转**](https://lstarxyx.github.io/lstar-tool/tools/image-base64/)：拖拽或选择图片生成 Base64；也可粘贴带或不带 `data:image/...;base64,` 前缀的内容生成图片。无前缀时默认按 JPG 解析，支持预览大图与下载。
 - [**JSON 格式化**](https://lstarxyx.github.io/lstar-tool/tools/json-formatter/)：输入 JSON 后查看可折叠的树状节点；支持节点值编辑并回写到源文本，以及格式化、紧凑、转义、移除转义、全部折叠与展开。
+- [**URL 编码解码**](https://lstarxyx.github.io/lstar-tool/tools/url-codec/)：在浏览器本地对 URL、查询参数及任意文本进行百分号编码或解码，解码时兼容查询字符串中的加号空格。
+- [**MD5 加密**](https://lstarxyx.github.io/lstar-tool/tools/md5/)：实时生成 32 位、16 位及大小写四种 MD5 摘要，每项结果均可一键复制。
+- [**时间戳转换**](https://lstarxyx.github.io/lstar-tool/tools/timestamp/)：在秒级或默认毫秒级时间戳与年月日时分秒之间双向转换，支持复制标准、斜杠、中文、ISO 8601 等日期格式。
 
 ## 规划中的工具
 
 - 二维码生成与解析
 - HEX、RGB、HSL 颜色转换
-- URL 编码与解码
-- 时间戳与日期转换
 - 文本与代码处理工具
 
 欢迎通过 Issue 提出常用工具需求。

@@ -26,6 +26,10 @@ Use Vitest for deterministic utility and parsing tests. Name files `*.test.ts` b
 
 Each tool needs a static Vite HTML entry at `tools/<tool-slug>/index.html`, a route in `App.tsx`, and a sitemap entry. Give it a unique title, description, canonical URL, H1, usage copy, and FAQ. Use stable lowercase kebab-case slugs such as `tools/json-formatter/`.
 
+## Documentation Synchronization
+
+When adding a tool or making a substantial change to an existing tool's functionality, update `README.md` in the same change. Keep its implemented-tools list, descriptions, links, and planned-tools section aligned with the current product.
+
 ## Commit & Pull Request Guidelines
 
 Follow the existing Conventional Commit style: `feat: add searchable toolbox` or `ci: deploy main builds`. Keep commits focused. Pull requests should explain user-visible behavior, list verification commands, link related issues when applicable, and include screenshots or a short recording for visual changes. Do not commit `dist`, local configuration, credentials, or user-provided files.
