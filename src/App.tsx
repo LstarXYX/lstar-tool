@@ -3,11 +3,14 @@ import { ArrowLeft, ArrowRight, Box, CheckCircle2, ChevronLeft, ChevronRight, Co
 import { tools, type ToolDefinition } from './data/tools'
 import { ImageBase64Tool } from './features/image-base64/ImageBase64Tool'
 import { JsonFormatterTool } from './features/json-formatter/JsonFormatterTool'
+import { UrlCodecTool } from './features/url-codec/UrlCodecTool'
+import { Md5Tool } from './features/md5/Md5Tool'
+import { TimestampTool } from './features/timestamp/TimestampTool'
 
-type View = 'home' | 'toolbox' | 'image-base64' | 'json'
+type View = 'home' | 'toolbox' | 'image-base64' | 'json' | 'url-codec' | 'md5' | 'timestamp'
 type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
-const categories: Category[] = ['全部', '图片处理', '开发辅助', '效率工具', '我的收藏']
+const categories: Category[] = ['全部', '图片处理', '编码/解码', '开发辅助', '效率工具', '我的收藏']
 const favouritesKey = 'lstar-tools:favourites'
 const appBase = import.meta.env.BASE_URL
 
@@ -15,6 +18,9 @@ const getViewFromLocation = (): View => {
   const path = window.location.pathname.replace(/\/+$/, '')
   if (path.endsWith('/tools/image-base64')) return 'image-base64'
   if (path.endsWith('/tools/json-formatter')) return 'json'
+  if (path.endsWith('/tools/url-codec')) return 'url-codec'
+  if (path.endsWith('/tools/md5')) return 'md5'
+  if (path.endsWith('/tools/timestamp')) return 'timestamp'
   if (path.endsWith('/tools')) return 'toolbox'
   return 'home'
 }
@@ -24,6 +30,9 @@ const getPathForView = (view: View) => ({
   toolbox: `${appBase}tools/`,
   'image-base64': `${appBase}tools/image-base64/`,
   json: `${appBase}tools/json-formatter/`,
+  'url-codec': `${appBase}tools/url-codec/`,
+  md5: `${appBase}tools/md5/`,
+  timestamp: `${appBase}tools/timestamp/`,
 }[view])
 
 function ToolCard({ tool, favourite, onOpen, onToggleFavourite }: { tool: ToolDefinition; favourite: boolean; onOpen: (id: string) => void; onToggleFavourite: (id: string) => void }) {
@@ -51,7 +60,7 @@ function App() {
 
   useEffect(() => { localStorage.setItem(favouritesKey, JSON.stringify(favourites)) }, [favourites])
   useEffect(() => {
-    document.title = view === 'json' ? 'JSON 格式化工具 · Lstar Tools' : view === 'image-base64' ? '图片与 Base64 互转 · Lstar Tools' : view === 'toolbox' ? '工具箱 · Lstar Tools' : 'Lstar Tools · 轻巧的开发工具箱'
+    document.title = view === 'json' ? 'JSON 格式化工具 · Lstar Tools' : view === 'image-base64' ? '图片与 Base64 互转 · Lstar Tools' : view === 'url-codec' ? 'URL 编码解码 · Lstar Tools' : view === 'md5' ? 'MD5 加密 · Lstar Tools' : view === 'timestamp' ? '时间戳转换 · Lstar Tools' : view === 'toolbox' ? '工具箱 · Lstar Tools' : 'Lstar Tools · 轻巧的开发工具箱'
   }, [view])
   useEffect(() => {
     const handlePopState = () => setView(getViewFromLocation())
@@ -67,7 +76,7 @@ function App() {
   }
 
   const openTool = (id: string) => {
-    if (id === 'image-base64' || id === 'json') {
+    if (id === 'image-base64' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp') {
       navigate(id)
     }
   }
@@ -92,6 +101,9 @@ function App() {
       <main>
         {view === 'image-base64' && <ImageBase64Tool onBack={showToolbox} />}
         {view === 'json' && <JsonFormatterTool onBack={showToolbox} />}
+        {view === 'url-codec' && <UrlCodecTool onBack={showToolbox} />}
+        {view === 'md5' && <Md5Tool onBack={showToolbox} />}
+        {view === 'timestamp' && <TimestampTool onBack={showToolbox} />}
         {view === 'home' && <>
           <section className="hero">
             <div className="hero-copy"><span className="hero-badge"><Sparkles size={14} />为开发者而生</span><h1>简单工具，<br /><em>专注创造。</em></h1><p>一组快速、可靠且尊重隐私的在线小工具。没有冗余步骤，帮你把时间留给真正重要的工作。</p><button className="hero-button" type="button" onClick={showToolbox}>探索工具 <ArrowRight size={18} /></button></div>
