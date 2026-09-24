@@ -1,0 +1,23 @@
+# Lstar Tools
+
+> 面向开发者的轻量在线工具箱。所有现有工具均在浏览器本地运行，输入内容不会上传到服务器。
+
+## 站点入口
+
+- [首页](https://lstarxyx.github.io/lstar-tool/)：介绍 Lstar Tools 的隐私优先、本地处理理念。
+- [工具箱](https://lstarxyx.github.io/lstar-tool/tools/)：已实现工具的总览与入口。
+
+## 已实现工具
+
+- [图片与 Base64 互转](https://lstarxyx.github.io/lstar-tool/tools/image-base64/)：图片转 Base64，或 Base64 转图片；支持预览、复制和下载。
+- [JSON 格式化与结构编辑](https://lstarxyx.github.io/lstar-tool/tools/json-formatter/)：格式化、压缩、转义、移除转义以及树状结构编辑 JSON。
+- [URL 编码解码](https://lstarxyx.github.io/lstar-tool/tools/url-codec/)：编码或解码 URL、查询参数与文本，支持中文和特殊字符。
+- [MD5 加密](https://lstarxyx.github.io/lstar-tool/tools/md5/)：生成 32 位、16 位及大小写 MD5 摘要。
+- [时间戳转换](https://lstarxyx.github.io/lstar-tool/tools/timestamp/)：在秒级、毫秒级时间戳与日期时间格式之间转换。
+
+## 重要说明
+
+- 网站语言：简体中文（zh-CN）。
+- 所有现有工具免费使用，无需注册。
+- 处理在用户当前浏览器中完成；刷新或关闭页面后，输入内容不会由本站保留。
+- 站点地图：[sitemap.xml](https://lstarxyx.github.io/lstar-tool/sitemap.xml)。

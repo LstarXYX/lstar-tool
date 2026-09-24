@@ -24,7 +24,9 @@ Use Vitest for deterministic utility and parsing tests. Name files `*.test.ts` b
 
 ## SEO and Tool Pages
 
-Each tool needs a static Vite HTML entry at `tools/<tool-slug>/index.html`, a route in `App.tsx`, and a sitemap entry. Give it a unique title, description, canonical URL, H1, usage copy, and FAQ. Use stable lowercase kebab-case slugs such as `tools/json-formatter/`.
+Each tool needs a static Vite HTML entry at `tools/<tool-slug>/index.html`, a route in `App.tsx`, and a sitemap entry. Give it a unique title, description, canonical URL, H1, usage copy, and FAQ. Use stable lowercase kebab-case slugs such as `tools/json-formatter/`. Keep `src/data/site.ts`, the static HTML metadata, JSON-LD, and the semantic `#static-content` fallback aligned so client-side navigation and non-JavaScript crawlers receive consistent information.
+
+Maintain `public/sitemap.xml` whenever a public page changes: include every indexable page and update that page's `<lastmod>` date in ISO `YYYY-MM-DD` format. Maintain `public/llms.txt` whenever site structure, tool availability, tool behavior, or privacy promises change.
 
 ## Documentation Synchronization
 
