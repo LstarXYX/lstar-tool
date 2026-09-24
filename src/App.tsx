@@ -9,6 +9,22 @@ type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
 const categories: Category[] = ['全部', '图片处理', '开发辅助', '效率工具', '我的收藏']
 const favouritesKey = 'lstar-tools:favourites'
+const appBase = import.meta.env.BASE_URL
+
+const getViewFromLocation = (): View => {
+  const path = window.location.pathname.replace(/\/+$/, '')
+  if (path.endsWith('/tools/image-base64')) return 'image-base64'
+  if (path.endsWith('/tools/json-formatter')) return 'json'
+  if (path.endsWith('/tools')) return 'toolbox'
+  return 'home'
+}
+
+const getPathForView = (view: View) => ({
+  home: appBase,
+  toolbox: `${appBase}tools/`,
+  'image-base64': `${appBase}tools/image-base64/`,
+  json: `${appBase}tools/json-formatter/`,
+}[view])
 
 function ToolCard({ tool, favourite, onOpen, onToggleFavourite }: { tool: ToolDefinition; favourite: boolean; onOpen: (id: string) => void; onToggleFavourite: (id: string) => void }) {
   const Icon = tool.icon
@@ -25,7 +41,7 @@ function ToolCard({ tool, favourite, onOpen, onToggleFavourite }: { tool: ToolDe
 }
 
 function App() {
-  const [view, setView] = useState<View>('home')
+  const [view, setView] = useState<View>(getViewFromLocation)
   const [favourites, setFavourites] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem(favouritesKey) ?? '[]') as string[] } catch { return [] }
   })
@@ -37,15 +53,26 @@ function App() {
   useEffect(() => {
     document.title = view === 'json' ? 'JSON 格式化工具 · Lstar Tools' : view === 'image-base64' ? '图片与 Base64 互转 · Lstar Tools' : view === 'toolbox' ? '工具箱 · Lstar Tools' : 'Lstar Tools · 轻巧的开发工具箱'
   }, [view])
+  useEffect(() => {
+    const handlePopState = () => setView(getViewFromLocation())
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const navigate = (nextView: View, scroll = true) => {
+    const nextPath = getPathForView(nextView)
+    if (window.location.pathname !== nextPath) window.history.pushState({}, '', nextPath)
+    setView(nextView)
+    if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const openTool = (id: string) => {
     if (id === 'image-base64' || id === 'json') {
-      setView(id)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      navigate(id)
     }
   }
-  const showToolbox = () => { setView('toolbox'); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-  const showAbout = () => { setView('home'); window.setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 0) }
+  const showToolbox = () => navigate('toolbox')
+  const showAbout = () => { navigate('home', false); window.setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 0) }
   const toggleFavourite = (id: string) => setFavourites((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
   const filteredTools = useMemo(() => tools.filter((tool) => {
     const matchCategory = category === '全部' || (category === '我的收藏' ? favourites.includes(tool.id) : tool.category === category)
@@ -57,7 +84,7 @@ function App() {
   return (
     <div className="app-shell">
       <header className="site-header">
-        <button className="brand" type="button" onClick={() => { setView('home'); window.scrollTo({ top: 0, behavior: 'smooth' }) }} aria-label="返回首页"><span className="brand-mark"><Sparkles size={18} /></span><span>Lstar <b>Tools</b></span></button>
+        <button className="brand" type="button" onClick={() => navigate('home')} aria-label="返回首页"><span className="brand-mark"><Sparkles size={18} /></span><span>Lstar <b>Tools</b></span></button>
         <nav aria-label="主导航"><button className={view === 'toolbox' ? 'active' : ''} type="button" onClick={showToolbox}>工具箱</button><button type="button" onClick={showAbout}>关于我们</button></nav>
         <a className="github-link" href="https://github.com/LstarXYX/lstar-tool" target="_blank" rel="noreferrer"><Code2 size={17} />GitHub</a>
       </header>
@@ -73,7 +100,7 @@ function App() {
           <section className="tools-section home-tools"><div className="section-heading"><div><span className="eyebrow">TOOLBOX</span><h2>为下一项工作选个工具</h2></div><button className="show-all-button" type="button" onClick={showToolbox}>查看全部 <ArrowRight size={16} /></button></div><div className="tool-carousel-wrap"><button className="carousel-control previous" type="button" aria-label="查看上一组工具" onClick={() => scrollCarousel(-1)}><ChevronLeft size={19} /></button><div className="tool-carousel" ref={carouselRef}>{tools.map((tool) => <ToolCard key={tool.id} tool={tool} favourite={favourites.includes(tool.id)} onOpen={openTool} onToggleFavourite={toggleFavourite} />)}</div><button className="carousel-control next" type="button" aria-label="查看下一组工具" onClick={() => scrollCarousel(1)}><ChevronRight size={19} /></button></div><p className="carousel-hint">工具会持续更新；此处预留横向浏览体验。</p></section>
           <section className="values" id="about"><div><span className="value-icon"><LockKeyhole size={20} /></span><h3>隐私优先</h3><p>处理过程留在你的设备中，数据无需上传。</p></div><div><span className="value-icon"><Code2 size={20} /></span><h3>轻巧直接</h3><p>打开即用，减少不必要的配置与等待。</p></div><div><span className="value-icon"><Box size={20} /></span><h3>持续扩展</h3><p>围绕实际需求，逐步加入更多实用工具。</p></div></section>
         </>}
-        {view === 'toolbox' && <section className="toolbox-page"><div className="toolbox-hero"><button className="back-button" type="button" onClick={() => setView('home')}><ArrowLeft size={16} />返回首页</button><span className="eyebrow">ALL TOOLS</span><h1>找到适合你的工具</h1><p>按类别筛选、搜索名称或描述；点击心形即可收藏，收藏信息仅保存在当前浏览器。</p></div><div className="toolbox-controls"><label className="search-field"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索工具，例如 Base64、JSON…" /></label><div className="category-tabs" aria-label="工具分类">{categories.map((item) => <button className={category === item ? 'active' : ''} type="button" key={item} onClick={() => setCategory(item)}>{item}{item === '我的收藏' && favourites.length > 0 ? ` · ${favourites.length}` : ''}</button>)}</div></div><div className="toolbox-results"><p>{filteredTools.length ? `共找到 ${filteredTools.length} 个工具` : '没有找到匹配的工具'}</p><div className="tool-grid all-tools">{filteredTools.map((tool) => <ToolCard key={tool.id} tool={tool} favourite={favourites.includes(tool.id)} onOpen={openTool} onToggleFavourite={toggleFavourite} />)}</div>{!filteredTools.length && <div className="empty-state"><Heart size={24} /><h2>这里还没有工具</h2><p>试试切换分类、修改搜索内容，或先收藏喜欢的工具。</p></div>}</div></section>}
+        {view === 'toolbox' && <section className="toolbox-page"><div className="toolbox-hero"><button className="back-button" type="button" onClick={() => navigate('home')}><ArrowLeft size={16} />返回首页</button><span className="eyebrow">ALL TOOLS</span><h1>找到适合你的工具</h1><p>按类别筛选、搜索名称或描述；点击心形即可收藏，收藏信息仅保存在当前浏览器。</p></div><div className="toolbox-controls"><label className="search-field"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索工具，例如 Base64、JSON…" /></label><div className="category-tabs" aria-label="工具分类">{categories.map((item) => <button className={category === item ? 'active' : ''} type="button" key={item} onClick={() => setCategory(item)}>{item}{item === '我的收藏' && favourites.length > 0 ? ` · ${favourites.length}` : ''}</button>)}</div></div><div className="toolbox-results"><p>{filteredTools.length ? `共找到 ${filteredTools.length} 个工具` : '没有找到匹配的工具'}</p><div className="tool-grid all-tools">{filteredTools.map((tool) => <ToolCard key={tool.id} tool={tool} favourite={favourites.includes(tool.id)} onOpen={openTool} onToggleFavourite={toggleFavourite} />)}</div>{!filteredTools.length && <div className="empty-state"><Heart size={24} /><h2>这里还没有工具</h2><p>试试切换分类、修改搜索内容，或先收藏喜欢的工具。</p></div>}</div></section>}
       </main>
       <footer><span>© 2026 Lstar Tools</span><span>Built for focused work.</span></footer>
     </div>

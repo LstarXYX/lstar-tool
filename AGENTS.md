@@ -22,6 +22,10 @@ Use TypeScript with functional React components and two-space indentation. Compo
 
 Use Vitest for deterministic utility and parsing tests. Name files `*.test.ts` beside the unit under test and describe observable behavior, such as unprefixed Base64 defaulting to JPEG. Cover valid input, invalid input, and normalization paths when changing conversion logic. No numeric coverage threshold is configured; add focused tests for every new non-trivial helper.
 
+## SEO and Tool Pages
+
+Each tool needs a static Vite HTML entry at `tools/<tool-slug>/index.html`, a route in `App.tsx`, and a sitemap entry. Give it a unique title, description, canonical URL, H1, usage copy, and FAQ. Use stable lowercase kebab-case slugs such as `tools/json-formatter/`.
+
 ## Commit & Pull Request Guidelines
 
 Follow the existing Conventional Commit style: `feat: add searchable toolbox` or `ci: deploy main builds`. Keep commits focused. Pull requests should explain user-visible behavior, list verification commands, link related issues when applicable, and include screenshots or a short recording for visual changes. Do not commit `dist`, local configuration, credentials, or user-provided files.

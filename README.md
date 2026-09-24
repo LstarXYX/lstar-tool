@@ -6,8 +6,8 @@
 
 ## 已实现工具
 
-- **图片 / Base64 互转**：拖拽或选择图片生成 Base64；也可粘贴带或不带 `data:image/...;base64,` 前缀的内容生成图片。无前缀时默认按 JPG 解析，支持预览大图与下载。
-- **JSON 格式化**：输入 JSON 后查看可折叠的树状节点；支持节点值编辑并回写到源文本，以及格式化、紧凑、转义、移除转义、全部折叠与展开。
+- [**图片 / Base64 互转**](https://lstarxyx.github.io/lstar-tool/tools/image-base64/)：拖拽或选择图片生成 Base64；也可粘贴带或不带 `data:image/...;base64,` 前缀的内容生成图片。无前缀时默认按 JPG 解析，支持预览大图与下载。
+- [**JSON 格式化**](https://lstarxyx.github.io/lstar-tool/tools/json-formatter/)：输入 JSON 后查看可折叠的树状节点；支持节点值编辑并回写到源文本，以及格式化、紧凑、转义、移除转义、全部折叠与展开。
 
 ## 规划中的工具
 

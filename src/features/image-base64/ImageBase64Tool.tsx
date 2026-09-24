@@ -145,6 +145,16 @@ export function ImageBase64Tool({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="privacy-note"><Trash2 size={16} /><span>你的文件和文本不会离开当前设备；刷新或关闭页面后，数据即被清除。</span></div>
+      <section className="tool-seo-content" aria-labelledby="image-guide-title">
+        <h2 id="image-guide-title">图片与 Base64 转换说明</h2>
+        <p>Base64 是把图片二进制内容编码为文本的方式，常用于嵌入 HTML、CSS 或接口数据。上传图片后可复制完整数据 URL；粘贴 Base64 后可在线预览大图并下载。</p>
+        <h2>常见问题</h2>
+        <div className="faq-grid">
+          <article><h3>Base64 没有 data 前缀怎么办？</h3><p>直接粘贴即可。工具会自动补全前缀，并默认把无前缀内容按 JPG 图片解析。</p></article>
+          <article><h3>图片会上传到服务器吗？</h3><p>不会。读取、转换、预览和下载都由当前浏览器完成，文件不会离开你的设备。</p></article>
+          <article><h3>为什么 Base64 文本很长？</h3><p>Base64 会增加内容体积，适合小型资源或数据传递；大图片通常更适合作为独立文件引用。</p></article>
+        </div>
+      </section>
       {notice && <div className={`toast ${notice.type}`} role="status">{notice.text}</div>}
       {isViewerOpen && resultPreview && <div className="image-viewer" role="dialog" aria-modal="true" aria-label="图片大图预览" onMouseDown={() => setIsViewerOpen(false)}><div className="image-viewer-content" onMouseDown={(event) => event.stopPropagation()}><div className="image-viewer-header"><span>图片大图预览</span><button type="button" onClick={() => setIsViewerOpen(false)} aria-label="关闭大图预览"><X size={20} /></button></div><img src={resultPreview} alt="由 Base64 生成的大图" /><button className="download-button viewer-download" type="button" onClick={downloadImage}><Download size={16} />下载图片</button></div></div>}
     </section>

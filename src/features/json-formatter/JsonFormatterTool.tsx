@@ -66,5 +66,15 @@ export function JsonFormatterTool({ onBack }: { onBack: () => void }) {
       <article className="json-panel tree-panel"><div className="json-panel-heading"><div><span className="step-number">02</span><h2>结构化视图</h2></div><span>{parsed.error ? '等待有效 JSON' : '可编辑节点'}</span></div>{parsed.error ? <div className="json-empty"><Braces size={26} /><h2>等待有效 JSON</h2><p>修正左侧内容后，即可查看和编辑树状节点。</p></div> : <div className="json-tree"><TreeNode value={parsed.value} path={[]} collapsed={collapsed} onToggle={toggle} onEdit={editNode} /></div>}</article>
     </div>
     <div className="privacy-note"><Sparkles size={16} /><span>所有 JSON 解析、格式化与编辑均在当前浏览器内完成，不会上传你的内容。</span></div>
+    <section className="tool-seo-content" aria-labelledby="json-guide-title">
+      <h2 id="json-guide-title">在线 JSON 格式化与编辑</h2>
+      <p>JSON 是接口传输和配置文件中常用的数据格式。此工具可校验语法、格式化缩进、压缩为单行文本，并通过右侧树状结构快速定位和修改字段。</p>
+      <h2>常见问题</h2>
+      <div className="faq-grid">
+        <article><h3>右侧修改字段后会更新原始 JSON 吗？</h3><p>会。修改可编辑的叶子节点后，左侧会立即生成对应的格式化 JSON。</p></article>
+        <article><h3>格式化、紧凑和转义有什么区别？</h3><p>格式化增加可读缩进，紧凑移除无关空白；转义会把文本包装为 JSON 字符串，移除转义则还原一层字符串内容。</p></article>
+        <article><h3>输入内容会被保存或上传吗？</h3><p>不会。JSON 的解析和编辑仅在浏览器内执行，刷新或关闭页面后内容不会被本站保留。</p></article>
+      </div>
+    </section>
   </section>
 }
