@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
-import { Check, Clipboard, Download, FileImage, ImageUp, RefreshCw, Trash2, Upload } from 'lucide-react'
+import { Check, Clipboard, Download, FileImage, ImageUp, Maximize2, RefreshCw, Trash2, Upload, X } from 'lucide-react'
 import { base64ToBlob, base64ToDataUrl, isValidBase64 } from './utils'
 
 type Notice = { text: string; type: 'success' | 'error' } | null
@@ -10,13 +10,14 @@ const bytesToLabel = (bytes: number) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export function ImageBase64Tool() {
+export function ImageBase64Tool({ onBack }: { onBack: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [base64, setBase64] = useState('')
   const [imageName, setImageName] = useState('')
   const [imageSize, setImageSize] = useState(0)
   const [imagePreview, setImagePreview] = useState('')
   const [resultPreview, setResultPreview] = useState('')
+  const [isViewerOpen, setIsViewerOpen] = useState(false)
   const [notice, setNotice] = useState<Notice>(null)
 
   useEffect(() => {
@@ -24,6 +25,12 @@ export function ImageBase64Tool() {
     const timeout = window.setTimeout(() => setNotice(null), 2600)
     return () => window.clearTimeout(timeout)
   }, [notice])
+
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setIsViewerOpen(false) }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [])
 
   const showNotice = (text: string, type: Notice extends null ? never : 'success' | 'error') => setNotice({ text, type })
 
@@ -97,6 +104,7 @@ export function ImageBase64Tool() {
     setImageSize(0)
     setImagePreview('')
     setResultPreview('')
+    setIsViewerOpen(false)
     if (inputRef.current) inputRef.current.value = ''
   }
 
@@ -104,6 +112,7 @@ export function ImageBase64Tool() {
     <section className="tool-workspace" aria-label="图片与 Base64 转换器">
       <div className="tool-intro">
         <div>
+          <button className="back-button" type="button" onClick={onBack}>← 返回工具箱</button>
           <span className="eyebrow">IMAGE CONVERTER</span>
           <h1>图片与 Base64 互转</h1>
           <p>完全在本地浏览器中处理。Base64 可直接粘贴，缺少数据前缀时默认按 JPG 图片解析。</p>
@@ -131,12 +140,13 @@ export function ImageBase64Tool() {
             <button className="primary-button" type="button" onClick={convertBase64}><Upload size={17} />生成图片</button>
             <button className="secondary-button" type="button" onClick={copyBase64} disabled={!base64}><Clipboard size={16} />复制</button>
           </div>
-          {resultPreview && <div className="result-area"><img src={resultPreview} alt="由 Base64 生成的图片" /><div><span><Check size={16} />转换成功</span><button className="download-button" type="button" onClick={downloadImage}><Download size={16} />下载图片</button></div></div>}
+          {resultPreview && <div className="result-area"><button className="preview-image-button" type="button" onClick={() => setIsViewerOpen(true)} aria-label="在线查看大图"><img src={resultPreview} alt="由 Base64 生成的图片" /><span><Maximize2 size={16} />查看大图</span></button><div><span><Check size={16} />转换成功</span><button className="download-button" type="button" onClick={downloadImage}><Download size={16} />下载图片</button></div></div>}
         </article>
       </div>
 
       <div className="privacy-note"><Trash2 size={16} /><span>你的文件和文本不会离开当前设备；刷新或关闭页面后，数据即被清除。</span></div>
       {notice && <div className={`toast ${notice.type}`} role="status">{notice.text}</div>}
+      {isViewerOpen && resultPreview && <div className="image-viewer" role="dialog" aria-modal="true" aria-label="图片大图预览" onMouseDown={() => setIsViewerOpen(false)}><div className="image-viewer-content" onMouseDown={(event) => event.stopPropagation()}><div className="image-viewer-header"><span>图片大图预览</span><button type="button" onClick={() => setIsViewerOpen(false)} aria-label="关闭大图预览"><X size={20} /></button></div><img src={resultPreview} alt="由 Base64 生成的大图" /><button className="download-button viewer-download" type="button" onClick={downloadImage}><Download size={16} />下载图片</button></div></div>}
     </section>
   )
 }
