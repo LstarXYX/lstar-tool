@@ -14,7 +14,22 @@ type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
 const categories: Category[] = ['全部', '图片处理', '编码/解码', '开发辅助', '效率工具', '我的收藏']
 const favouritesKey = 'lstar-tools:favourites'
-const appBase = import.meta.env.BASE_URL
+
+const routeByView: Record<View, string> = {
+  home: '',
+  toolbox: 'tools/',
+  'image-base64': 'tools/image-base64/',
+  json: 'tools/json-formatter/',
+  'url-codec': 'tools/url-codec/',
+  md5: 'tools/md5/',
+  timestamp: 'tools/timestamp/',
+}
+
+const getDeploymentBase = () => {
+  const pathname = window.location.pathname.endsWith('/') ? window.location.pathname : `${window.location.pathname}/`
+  const currentRoute = Object.values(routeByView).sort((left, right) => right.length - left.length).find((route) => route && pathname.endsWith(route))
+  return currentRoute ? pathname.slice(0, -currentRoute.length) : pathname
+}
 
 const getViewFromLocation = (): View => {
   const path = window.location.pathname.replace(/\/+$/, '')
@@ -27,15 +42,7 @@ const getViewFromLocation = (): View => {
   return 'home'
 }
 
-const getPathForView = (view: View) => ({
-  home: appBase,
-  toolbox: `${appBase}tools/`,
-  'image-base64': `${appBase}tools/image-base64/`,
-  json: `${appBase}tools/json-formatter/`,
-  'url-codec': `${appBase}tools/url-codec/`,
-  md5: `${appBase}tools/md5/`,
-  timestamp: `${appBase}tools/timestamp/`,
-}[view])
+const getPathForView = (view: View) => `${getDeploymentBase()}${routeByView[view]}`
 
 function AppLink({ view, children, className, onClick }: { view: View; children: ReactNode; className?: string; onClick?: () => void }) {
   return <a className={className} href={getPathForView(view)} onClick={(event) => { event.preventDefault(); onClick?.() }}>{children}</a>
@@ -111,7 +118,7 @@ function App() {
     <div className="app-shell">
       <header className="site-header">
         <button className="brand" type="button" onClick={() => navigate('home')} aria-label="返回首页"><span className="brand-mark"><Sparkles size={18} /></span><span>Lstar <b>Tools</b></span></button>
-        <nav aria-label="主导航"><AppLink className={view === 'toolbox' ? 'active' : ''} view="toolbox" onClick={showToolbox}>工具箱</AppLink><a href={`${appBase}#about`} onClick={(event) => { event.preventDefault(); showAbout() }}>关于我们</a></nav>
+        <nav aria-label="主导航"><AppLink className={view === 'toolbox' ? 'active' : ''} view="toolbox" onClick={showToolbox}>工具箱</AppLink><a href={`${getPathForView('home')}#about`} onClick={(event) => { event.preventDefault(); showAbout() }}>关于我们</a></nav>
         <a className="github-link" href="https://github.com/LstarXYX/lstar-tool" target="_blank" rel="noreferrer"><Code2 size={17} />GitHub</a>
       </header>
 

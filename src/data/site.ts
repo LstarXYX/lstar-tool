@@ -1,4 +1,6 @@
-export const siteUrl = 'https://lstarxyx.github.io/lstar-tool/'
+import { siteUrl } from './siteConfig'
+
+export { siteUrl }
 
 export type PageMetadata = {
   title: string

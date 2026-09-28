@@ -2,12 +2,35 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { readFile, writeFile } from 'node:fs/promises'
+import { siteHostname, siteUrl } from './src/data/siteConfig.ts'
 
 const projectRoot = fileURLToPath(new URL('.', import.meta.url))
+const publicFilesWithSiteUrls = ['sitemap.xml', 'robots.txt', 'llms.txt']
+
+const replaceSitePlaceholders = (content: string) => content
+  .replaceAll('{{SITE_URL}}', siteUrl)
+  .replaceAll('{{SITE_HOSTNAME}}', siteHostname)
+
+const siteUrlPlugin = () => ({
+  name: 'site-url-placeholders',
+  transformIndexHtml: (html: string) => replaceSitePlaceholders(html),
+  generateBundle() {
+    this.emitFile({ type: 'asset', fileName: 'CNAME', source: siteHostname })
+  },
+  closeBundle: async () => {
+    await Promise.all(publicFilesWithSiteUrls.map(async (file) => {
+      const outputPath = resolve(projectRoot, 'dist', file)
+      const content = await readFile(outputPath, 'utf8')
+      await writeFile(outputPath, replaceSitePlaceholders(content))
+    }))
+  },
+})
 
 export default defineConfig({
-  base: '/lstar-tool/',
-  plugins: [react()],
+  // Relative asset URLs let the same bundle work at the domain root or in a subdirectory.
+  base: './',
+  plugins: [react(), siteUrlPlugin()],
   build: {
     rollupOptions: {
       input: {
