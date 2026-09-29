@@ -33,6 +33,17 @@ npm install
 npm run dev
 ```
 
+### OCR CDN（可选）
+
+默认情况下，OCR 模型和 WASM 资源由本站按需提供。若站点部署在 GitHub Pages 等海外源站且主要面向国内用户，可复制 [`.env.example`](.env.example) 为 `.env.local`，配置资源 CDN 基址后重新构建：
+
+- `VITE_OCR_MODEL_CDN_BASE_URL`：Paddle 官方模型源可用 `https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/`；也可替换为已同步四个 `.tar` 模型文件的自有 OSS/CDN。
+- `VITE_OCR_WASM_CDN_BASE_URL`：可填写与锁定版本一致的 ONNX Runtime 静态文件 CDN，例如 `https://cdn.jsdelivr.net/npm/onnxruntime-web@1.30.0/dist/`。国内生产环境更建议将这些文件同步到自有 OSS 后接入阿里云、腾讯云或又拍云 CDN。
+
+未设置变量时不会访问以上 CDN。
+
+OCR 页面也提供“资源加载配置”：可即时选择本站、Paddle 官方、jsDelivr 或自定义地址。自定义地址可使用 `http://`、`https://` 或 `/ocr-assets/` 一类相对路径，保存后在下一次识别生效；若当前页面使用 HTTPS，浏览器可能阻止 HTTP 资源。
+
 质量检查与生产构建：
 
 ```bash
