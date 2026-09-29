@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, Box, CheckCircle2, ChevronLeft, ChevronRight, Code2, Heart, LockKeyhole, Search, Sparkles } from 'lucide-react'
 import { tools, type ToolDefinition } from './data/tools'
 import { ImageBase64Tool } from './features/image-base64/ImageBase64Tool'
@@ -11,10 +11,13 @@ import { ColorTool } from './features/color/ColorTool'
 import { pageMetadata } from './data/site'
 import { usePageMetadata } from './usePageMetadata'
 
-type View = 'home' | 'toolbox' | 'image-base64' | 'json' | 'url-codec' | 'md5' | 'timestamp' | 'qrcode' | 'color'
+const OcrTool = lazy(async () => ({ default: (await import('./features/ocr/OcrTool')).OcrTool }))
+const DocumentConverterTool = lazy(async () => ({ default: (await import('./features/document-converter/DocumentConverterTool')).DocumentConverterTool }))
+
+type View = 'home' | 'toolbox' | 'image-base64' | 'json' | 'url-codec' | 'md5' | 'timestamp' | 'qrcode' | 'color' | 'ocr' | 'document-converter'
 type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
-const categories: Category[] = ['全部', '图片处理', '编码/解码', '开发辅助', '效率工具', '我的收藏']
+const categories: Category[] = ['全部', '图片处理', '文件转换', '编码/解码', '开发辅助', '效率工具', '我的收藏']
 const favouritesKey = 'lstar-tools:favourites'
 
 const routeByView: Record<View, string> = {
@@ -27,6 +30,8 @@ const routeByView: Record<View, string> = {
   timestamp: 'tools/timestamp/',
   qrcode: 'tools/qrcode/',
   color: 'tools/color/',
+  ocr: 'tools/ocr/',
+  'document-converter': 'tools/document-converter/',
 }
 
 const getDeploymentBase = () => {
@@ -44,6 +49,8 @@ const getViewFromLocation = (): View => {
   if (path.endsWith('/tools/timestamp')) return 'timestamp'
   if (path.endsWith('/tools/qrcode')) return 'qrcode'
   if (path.endsWith('/tools/color')) return 'color'
+  if (path.endsWith('/tools/ocr')) return 'ocr'
+  if (path.endsWith('/tools/document-converter')) return 'document-converter'
   if (path.endsWith('/tools')) return 'toolbox'
   return 'home'
 }
@@ -62,6 +69,8 @@ const toolViewById: Record<string, View> = {
   timestamp: 'timestamp',
   qrcode: 'qrcode',
   color: 'color',
+  ocr: 'ocr',
+  'document-converter': 'document-converter',
 }
 
 function ToolCard({ tool, favourite, onOpen, onToggleFavourite }: { tool: ToolDefinition; favourite: boolean; onOpen: (id: string) => void; onToggleFavourite: (id: string) => void }) {
@@ -108,7 +117,7 @@ function App() {
   }
 
   const openTool = (id: string) => {
-    if (id === 'image-base64' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp' || id === 'qrcode' || id === 'color') {
+    if (id === 'image-base64' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp' || id === 'qrcode' || id === 'color' || id === 'ocr' || id === 'document-converter') {
       navigate(id)
     }
   }
@@ -138,6 +147,8 @@ function App() {
         {view === 'timestamp' && <TimestampTool onBack={showToolbox} />}
         {view === 'qrcode' && <QrCodeTool onBack={showToolbox} />}
         {view === 'color' && <ColorTool onBack={showToolbox} />}
+        {view === 'ocr' && <Suspense fallback={<div className="tool-loading">正在加载 OCR 工具…</div>}><OcrTool onBack={showToolbox} /></Suspense>}
+        {view === 'document-converter' && <Suspense fallback={<div className="tool-loading">正在加载文件转换工具…</div>}><DocumentConverterTool onBack={showToolbox} /></Suspense>}
         {view !== 'home' && view !== 'toolbox' && <aside className="related-tools" aria-label="相关工具"><h2>继续使用其他工具</h2><p>所有工具均在浏览器本地处理。</p><div>{tools.filter((tool) => tool.available && toolViewById[tool.id] !== view).map((tool) => <AppLink key={tool.id} view={toolViewById[tool.id]} onClick={() => navigate(toolViewById[tool.id])}>{tool.name}</AppLink>)}</div></aside>}
         {view === 'home' && <>
           <section className="hero">

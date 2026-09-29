@@ -43,6 +43,8 @@ export default defineConfig({
         timestamp: resolve(projectRoot, 'tools/timestamp/index.html'),
         qrcode: resolve(projectRoot, 'tools/qrcode/index.html'),
         color: resolve(projectRoot, 'tools/color/index.html'),
+        ocr: resolve(projectRoot, 'tools/ocr/index.html'),
+        documentConverter: resolve(projectRoot, 'tools/document-converter/index.html'),
       },
     },
   },

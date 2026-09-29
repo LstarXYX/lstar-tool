@@ -53,8 +53,8 @@ export const pageMetadata = {
   },
   toolbox: {
     title: '开发者工具箱 · Lstar Tools',
-    description: '浏览 Lstar Tools 的本地在线开发工具：图片与 Base64 互转、二维码生成、颜色转换、JSON 格式化、URL 编码解码、MD5 加密和时间戳转换。',
-    keywords: '开发者工具箱,在线工具,二维码生成,颜色转换,JSON格式化,Base64转换,URL编码,MD5,时间戳转换',
+    description: '浏览 Lstar Tools 的本地在线工具：图片 OCR、Markdown 与 Word 转换、图片与 Base64 互转、二维码、颜色转换、JSON 格式化等。',
+    keywords: '开发者工具箱,在线工具,图片OCR,PaddleOCR,Markdown转Word,Word转Markdown,二维码生成,颜色转换,JSON格式化',
     canonical: `${siteUrl}tools/`,
     structuredData: {
       '@context': 'https://schema.org',
@@ -114,5 +114,19 @@ export const pageMetadata = {
     keywords: '颜色转换,在线取色,HEX转RGB,RGB转HSL,HSV转换,HWB转换',
     canonical: `${siteUrl}tools/color/`,
     structuredData: applicationSchema('颜色取色与转换 · Lstar Tools', `${siteUrl}tools/color/`, '在浏览器本地取色，并同步转换 HEX、RGB、HSL、HSV、HWB 颜色代码。', ['系统取色盘', 'HEX 与 HEXA', 'RGB 与 HSL', 'HSV 与 HWB', '透明度保留']),
+  },
+  ocr: {
+    title: '图片 OCR 文字识别 · Lstar Tools',
+    description: '免费的在线图片 OCR 识别工具，基于 PaddleOCR 和 WebAssembly 在浏览器本地提取图片中的中英文文字。',
+    keywords: '图片OCR,在线文字识别,PaddleOCR,图片转文字,OCR识别,WASM OCR',
+    canonical: `${siteUrl}tools/ocr/`,
+    structuredData: applicationSchema('图片 OCR 文字识别 · Lstar Tools', `${siteUrl}tools/ocr/`, '基于 PaddleOCR 与 WebAssembly，在浏览器本地识别图片中的文字。', ['PaddleOCR PP-OCRv5', '图片文字识别', '中英文识别', '浏览器本地处理']),
+  },
+  'document-converter': {
+    title: 'Markdown 与 Word 文件转换 · Lstar Tools',
+    description: '免费的在线 Markdown 与 Word 文档转换工具，支持 Markdown 转 Word、Word 转 Markdown，并预留 PDF 等更多格式。',
+    keywords: 'Markdown转Word,Word转Markdown,文件转换,MD转DOCX,DOCX转MD,在线文档转换',
+    canonical: `${siteUrl}tools/document-converter/`,
+    structuredData: applicationSchema('Markdown 与 Word 文件转换 · Lstar Tools', `${siteUrl}tools/document-converter/`, '在浏览器本地转换 Markdown 和 Word 文档，后续支持更多格式。', ['Markdown 转 Word', 'Word 转 Markdown', '本地文件处理', 'PDF 转换接口预留']),
   },
 } satisfies Record<string, PageMetadata>
