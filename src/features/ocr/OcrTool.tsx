@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
-import { Clipboard, FileImage, ImageUp, LoaderCircle, RefreshCw, ScanText } from 'lucide-react'
+import { Clipboard, FileImage, ImageUp, LoaderCircle, Maximize2, RefreshCw, ScanText, X } from 'lucide-react'
 import { defaultOcrRuntimeConfig, disposeOcrRuntime, ocrModes, recognizeImage, type OcrModelSource, type OcrMode, type OcrRecognition, type OcrRuntimeConfig, type OcrWasmSource } from './core/paddleOcr'
 
 type Notice = { text: string; type: 'success' | 'error' } | null
@@ -25,9 +25,15 @@ export function OcrTool({ onBack }: { onBack: () => void }) {
   const [switchingRuntime, setSwitchingRuntime] = useState(false)
   const [loading, setLoading] = useState(false)
   const [notice, setNotice] = useState<Notice>(null)
+  const [isViewerOpen, setIsViewerOpen] = useState(false)
 
   useEffect(() => () => { if (previewUrl) URL.revokeObjectURL(previewUrl) }, [previewUrl])
   useEffect(() => () => { void disposeOcrRuntime() }, [])
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setIsViewerOpen(false) }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [])
 
   const chooseFile = (nextFile: File) => {
     if (!nextFile.type.startsWith('image/')) {
@@ -37,7 +43,7 @@ export function OcrTool({ onBack }: { onBack: () => void }) {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
     setFile(nextFile)
     setPreviewUrl(URL.createObjectURL(nextFile))
-    setResult(null)
+    setResult(null); setIsViewerOpen(false)
     setNotice(null)
   }
 
@@ -61,7 +67,7 @@ export function OcrTool({ onBack }: { onBack: () => void }) {
   }
   const reset = () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
-    setFile(null); setPreviewUrl(''); setResult(null); setNotice(null)
+    setFile(null); setPreviewUrl(''); setResult(null); setNotice(null); setIsViewerOpen(false)
     if (inputRef.current) inputRef.current.value = ''
   }
   const changeRuntimeConfig = async (key: keyof OcrRuntimeConfig, value: OcrModelSource | OcrWasmSource) => {
@@ -106,14 +112,15 @@ export function OcrTool({ onBack }: { onBack: () => void }) {
         <fieldset className="ocr-mode-selector"><legend>识别模式</legend>{(Object.keys(ocrModes) as OcrMode[]).map((item) => <label key={item}><input type="radio" name="ocr-mode" value={item} checked={mode === item} onChange={() => { setMode(item); setResult(null) }} disabled={loading || switchingRuntime} /><span><b>{ocrModes[item].name}</b><small>{ocrModes[item].description}</small></span></label>)}</fieldset>
         <fieldset className="ocr-runtime-selector"><legend>资源加载配置</legend><label>模型来源<select value={runtimeConfig.modelSource} disabled={loading || switchingRuntime} onChange={(event) => void changeRuntimeConfig('modelSource', event.target.value as OcrModelSource)}><option value="site">本站资源</option><option value="paddle">Paddle 官方 CDN</option><option value="custom">自定义 CDN</option></select></label><label>WASM 来源<select value={runtimeConfig.wasmSource} disabled={loading || switchingRuntime} onChange={(event) => void changeRuntimeConfig('wasmSource', event.target.value as OcrWasmSource)}><option value="site">本站资源</option><option value="jsdelivr">jsDelivr CDN</option><option value="custom">自定义 CDN</option></select></label>{runtimeConfig.modelSource === 'custom' && <label className="ocr-custom-url">模型 CDN 基址<input type="url" inputMode="url" placeholder="https://cdn.example.com/ocr/ 或 /ocr-assets/" defaultValue={runtimeConfig.customModelBaseUrl} disabled={loading || switchingRuntime} onBlur={(event) => void saveCustomUrl('customModelBaseUrl', event.target.value)} /></label>}{runtimeConfig.wasmSource === 'custom' && <label className="ocr-custom-url">WASM CDN 基址<input type="url" inputMode="url" placeholder="https://cdn.example.com/ort/ 或 /ort-assets/" defaultValue={runtimeConfig.customWasmBaseUrl} disabled={loading || switchingRuntime} onBlur={(event) => void saveCustomUrl('customWasmBaseUrl', event.target.value)} /></label>}{switchingRuntime && <small>正在切换资源配置…</small>}</fieldset>
         {file && <div className="file-meta"><FileImage size={18} /><span>{file.name}</span><small>{bytesToLabel(file.size)}</small></div>}
-        {previewUrl && <img className="ocr-preview" src={previewUrl} alt="待识别图片预览" />}
+        {previewUrl && <button className="ocr-preview-button" type="button" onClick={() => setIsViewerOpen(true)} aria-label="放大查看待识别图片"><img className="ocr-preview" src={previewUrl} alt="待识别图片预览" /><span><Maximize2 size={16} />放大查看</span></button>}
         <button className="primary-button ocr-run-button" type="button" disabled={!file || loading} onClick={() => void recognize()}>{loading ? <LoaderCircle className="spin" size={17} /> : <ScanText size={17} />}{loading ? '正在加载模型并识别…' : '开始识别'}</button>
       </article>
       <article className="ocr-card"><div className="card-heading"><span className="step-number">02</span><div><h2>识别结果</h2><p>{result ? `识别到 ${result.lines.length} 行文字，用时 ${(result.elapsedMs / 1000).toFixed(2)} 秒。` : '上传图片并开始识别后，文本会显示在这里。'}</p></div></div>
         {result ? <><textarea className="ocr-result" value={text} readOnly aria-label="OCR 识别文本" /><div className="ocr-result-footer"><span>推理：{result.runtime}</span><button className="secondary-button" type="button" onClick={() => void copyResult()}><Clipboard size={16} />复制文本</button></div></> : <div className="ocr-empty"><ScanText size={31} /><h2>等待识别图片</h2><p>为获得更准确结果，请上传清晰、文字方向正常的图片。</p></div>}
       </article>
     </div>
-    <section className="tool-seo-content"><h2>图片 OCR 使用说明</h2><p>上传图片后，工具会在浏览器本地运行 PaddleOCR 的文字检测与识别模型。适合提取截图、扫描件和照片中的中英文文本；不需要创建账号，也不会把你的图片提交给本站。</p><h2>常见问题</h2><div className="faq-grid"><article><h3>极速和标准模式有什么区别？</h3><p>极速模式使用体积更小的 PP-OCRv6 Tiny，适合清晰图片；标准模式使用 PP-OCRv5 Mobile，适合复杂版面与小字号文字。</p></article><article><h3>哪些图片识别得更好？</h3><p>请使用清晰、对比度高、文字未明显倾斜的图片。过小、模糊或遮挡文字会影响结果。</p></article><article><h3>之后能识别 PDF 吗？</h3><p>OCR 核心已独立封装，未来 PDF 工具将把页面渲染为图片后复用同一套识别能力。</p></article></div></section>
+    <section className="tool-seo-content"><h2>图片 OCR 使用说明</h2><p>上传图片后，工具会在浏览器本地运行 PaddleOCR 的文字检测与识别模型。适合提取截图、扫描件和照片中的中英文文本；不需要创建账号，也不会把你的图片提交给本站。</p><h2>常见问题</h2><div className="faq-grid"><article><h3>极速和标准模式有什么区别？</h3><p>极速模式使用体积更小的 PP-OCRv6 Tiny，适合清晰图片；标准模式使用 PP-OCRv5 Mobile，适合复杂版面与小字号文字。</p></article><article><h3>哪些图片识别得更好？</h3><p>请使用清晰、对比度高、文字未明显倾斜的图片。过小、模糊或遮挡文字会影响结果。</p></article><article><h3>识别结果可以修改吗？</h3><p>可以。识别完成后可直接在结果框中编辑、选择或复制文字。</p></article></div></section>
     {notice && <div className={`toast ${notice.type}`} role="status">{notice.text}</div>}
+    {isViewerOpen && previewUrl && <div className="image-viewer" role="dialog" aria-modal="true" aria-label="待识别图片大图预览" onMouseDown={() => setIsViewerOpen(false)}><div className="image-viewer-content" onMouseDown={(event) => event.stopPropagation()}><div className="image-viewer-header"><span>待识别图片</span><button type="button" onClick={() => setIsViewerOpen(false)} aria-label="关闭大图预览"><X size={20} /></button></div><img src={previewUrl} alt="待识别图片大图预览" /></div></div>}
   </section>
 }

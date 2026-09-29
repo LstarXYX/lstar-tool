@@ -18,6 +18,10 @@ Run lint, tests, and a production build before opening a pull request. The GitHu
 
 Use TypeScript with functional React components and two-space indentation. Components use PascalCase filenames and exports (`ImageBase64Tool.tsx`); helpers use camelCase (`base64ToDataUrl`). Keep feature-specific browser APIs and validation close to the feature rather than adding them to `App.tsx`. Use the existing blue-and-white visual language, concise Chinese UI copy, Lucide icons, and CSS transitions that respect `prefers-reduced-motion`. Add new tools to `tools.ts` with an `id`, category, description, icon, and availability state.
 
+## User-Facing Copy
+
+Treat task requirements, implementation notes, future plans, and internal constraints as development instructions, not default page copy. Only render text that helps an end user operate the current feature or understand its visible outcome. Do not expose internal architecture, registries, reserved interfaces, deployment decisions, or future implementation requirements in the UI unless the user explicitly asks for that content to be shown. Keep user-facing copy concise and product-oriented; retain implementation rationale in code comments, documentation, or commit/PR descriptions instead.
+
 ## Testing Guidelines
 
 Use Vitest for deterministic utility and parsing tests. Name files `*.test.ts` beside the unit under test and describe observable behavior, such as unprefixed Base64 defaulting to JPEG. Cover valid input, invalid input, and normalization paths when changing conversion logic. No numeric coverage threshold is configured; add focused tests for every new non-trivial helper.

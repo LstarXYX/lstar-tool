@@ -18,9 +18,9 @@ describe('document conversion registry', () => {
     }
   })
 
-  it('converts basic Markdown into a DOCX blob', async () => {
+  it('converts a Markdown file into a DOCX blob', async () => {
     const conversion = documentConversions.find((item) => item.id === 'markdown-docx')
-    const result = await conversion?.run?.('# 标题\n\n- 第一项')
+    const result = await conversion?.run?.(new File(['# 标题\n\n- 第一项'], 'example.md', { type: 'text/markdown' }))
 
     expect(result?.filename).toBe('lstar-converted.docx')
     expect(result?.blob.type).toBe('application/vnd.openxmlformats-officedocument.wordprocessingml.document')

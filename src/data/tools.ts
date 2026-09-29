@@ -26,5 +26,5 @@ export const tools: ToolDefinition[] = [
   { id: 'qrcode', name: '二维码工具', description: '为文字与公开媒体链接生成二维码', icon: QrCode, category: '效率工具', available: true },
   { id: 'color', name: '颜色转换', description: '取色并同步转换 HEX、RGB、HSL、HSV、HWB', icon: Palette, category: '图片处理', available: true },
   { id: 'ocr', name: '图片 OCR 识别', description: '基于 PaddleOCR WASM 在浏览器本地提取图片文字', icon: ScanText, category: '图片处理', available: true },
-  { id: 'document-converter', name: 'Markdown / Word 转换', description: '本地转换 Markdown、Word 文档，并预留 PDF 等格式', icon: FileOutput, category: '文件转换', available: true },
+  { id: 'document-converter', name: 'Markdown / Word 转换', description: '在浏览器本地转换 Markdown 与 Word 文档', icon: FileOutput, category: '文件转换', available: true },
 ]

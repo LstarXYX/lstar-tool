@@ -124,9 +124,9 @@ export const pageMetadata = {
   },
   'document-converter': {
     title: 'Markdown 与 Word 文件转换 · Lstar Tools',
-    description: '免费的在线 Markdown 与 Word 文档转换工具，支持 Markdown 转 Word、Word 转 Markdown，并预留 PDF 等更多格式。',
+    description: '免费的在线 Markdown 与 Word 文档转换工具，支持 Markdown 转 Word 与 Word 转 Markdown，全程在浏览器本地处理。',
     keywords: 'Markdown转Word,Word转Markdown,文件转换,MD转DOCX,DOCX转MD,在线文档转换',
     canonical: `${siteUrl}tools/document-converter/`,
-    structuredData: applicationSchema('Markdown 与 Word 文件转换 · Lstar Tools', `${siteUrl}tools/document-converter/`, '在浏览器本地转换 Markdown 和 Word 文档，后续支持更多格式。', ['Markdown 转 Word', 'Word 转 Markdown', '本地文件处理', 'PDF 转换接口预留']),
+    structuredData: applicationSchema('Markdown 与 Word 文件转换 · Lstar Tools', `${siteUrl}tools/document-converter/`, '在浏览器本地转换 Markdown 和 Word 文档。', ['Markdown 转 Word', 'Word 转 Markdown', '本地文件处理']),
   },
 } satisfies Record<string, PageMetadata>

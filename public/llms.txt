@@ -17,7 +17,7 @@
 - [MD5 加密]({{SITE_URL}}tools/md5/)：生成 32 位、16 位及大小写 MD5 摘要。
 - [时间戳转换]({{SITE_URL}}tools/timestamp/)：在秒级、毫秒级时间戳与日期时间格式之间转换。
 - [图片 OCR 文字识别]({{SITE_URL}}tools/ocr/)：基于 PaddleOCR 与 WebAssembly 在浏览器本地识别图片中的中英文文字；可选极速 PP-OCRv6 Tiny 或标准 PP-OCRv5 模式，模型与运行时随站点部署，仅在开始识别时从本站按需加载。
-- [Markdown 与 Word 文件转换]({{SITE_URL}}tools/document-converter/)：在浏览器本地完成 Markdown 转 Word 与 DOCX 转 Markdown；PDF、HTML 等格式接口已预留，尚未开放。
+- [Markdown 与 Word 文件转换]({{SITE_URL}}tools/document-converter/)：上传 Markdown 或 DOCX 文件，在浏览器本地完成 Markdown 转 Word 与 DOCX 转 Markdown，支持点击与拖拽上传。
 
 ## 重要说明
 
