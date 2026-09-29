@@ -19,6 +19,13 @@ type PaddleOcrInstance = {
 
 let instancePromise: Promise<PaddleOcrInstance> | null = null
 
+const getLocalAssetUrl = (relativePath: string) => {
+  const currentPath = window.location.pathname
+  const toolsStart = currentPath.lastIndexOf('/tools/')
+  const sitePath = toolsStart >= 0 ? currentPath.slice(0, toolsStart + 1) : '/'
+  return new URL(`${sitePath}${relativePath}`, window.location.origin).href
+}
+
 /**
  * Shared browser-only OCR gateway. PDF tools can render a page to Blob and
  * call recognizeImage without knowing anything about PaddleOCR's runtime.
@@ -27,8 +34,10 @@ const getPaddleOcr = async () => {
   if (!instancePromise) {
     instancePromise = import('@paddleocr/paddleocr-js').then(async ({ PaddleOCR }) => {
       return PaddleOCR.create({
-        lang: 'ch',
-        ocrVersion: 'PP-OCRv5',
+        textDetectionModelName: 'PP-OCRv5_mobile_det',
+        textDetectionModelAsset: { url: getLocalAssetUrl('assets/ocr/models/PP-OCRv5_mobile_det_onnx_infer.tar') },
+        textRecognitionModelName: 'PP-OCRv5_mobile_rec',
+        textRecognitionModelAsset: { url: getLocalAssetUrl('assets/ocr/models/PP-OCRv5_mobile_rec_onnx_infer.tar') },
         ortOptions: { backend: 'wasm', simd: true, numThreads: 1 },
       }) as Promise<PaddleOcrInstance>
     })
