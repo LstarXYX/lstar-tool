@@ -117,10 +117,10 @@ export const pageMetadata = {
   },
   ocr: {
     title: '图片 OCR 文字识别 · Lstar Tools',
-    description: '免费的在线图片 OCR 识别工具，基于 PaddleOCR 和 WebAssembly 在浏览器本地提取图片中的中英文文字。',
+    description: '免费的在线图片 OCR 识别工具，基于 PaddleOCR 和 WebAssembly 在浏览器本地提取图片中的中英文文字，支持极速与标准模式。',
     keywords: '图片OCR,在线文字识别,PaddleOCR,图片转文字,OCR识别,WASM OCR',
     canonical: `${siteUrl}tools/ocr/`,
-    structuredData: applicationSchema('图片 OCR 文字识别 · Lstar Tools', `${siteUrl}tools/ocr/`, '基于 PaddleOCR 与 WebAssembly，在浏览器本地识别图片中的文字。', ['PaddleOCR PP-OCRv5', '图片文字识别', '中英文识别', '浏览器本地处理']),
+    structuredData: applicationSchema('图片 OCR 文字识别 · Lstar Tools', `${siteUrl}tools/ocr/`, '基于 PaddleOCR 与 WebAssembly，在浏览器本地识别图片中的文字。', ['PP-OCRv6 Tiny 极速模式', 'PP-OCRv5 标准模式', '中英文识别', '浏览器本地处理']),
   },
   'document-converter': {
     title: 'Markdown 与 Word 文件转换 · Lstar Tools',
