@@ -53,8 +53,8 @@ export const pageMetadata = {
   },
   toolbox: {
     title: '开发者工具箱 · Lstar Tools',
-    description: '浏览 Lstar Tools 的本地在线开发工具：图片与 Base64 互转、JSON 格式化、URL 编码解码、MD5 加密和时间戳转换。',
-    keywords: '开发者工具箱,在线工具,JSON格式化,Base64转换,URL编码,MD5,时间戳转换',
+    description: '浏览 Lstar Tools 的本地在线开发工具：图片与 Base64 互转、二维码生成、颜色转换、JSON 格式化、URL 编码解码、MD5 加密和时间戳转换。',
+    keywords: '开发者工具箱,在线工具,二维码生成,颜色转换,JSON格式化,Base64转换,URL编码,MD5,时间戳转换',
     canonical: `${siteUrl}tools/`,
     structuredData: {
       '@context': 'https://schema.org',
@@ -100,5 +100,19 @@ export const pageMetadata = {
     keywords: '时间戳转换,Unix时间戳,秒级时间戳,毫秒级时间戳,日期转时间戳',
     canonical: `${siteUrl}tools/timestamp/`,
     structuredData: applicationSchema('时间戳转换 · Lstar Tools', `${siteUrl}tools/timestamp/`, '在浏览器本地转换秒级、毫秒级时间戳与日期时间。', ['秒级时间戳', '毫秒级时间戳', '日期转时间戳', '多格式日期复制']),
+  },
+  qrcode: {
+    title: '二维码生成工具 · Lstar Tools',
+    description: '免费的在线二维码生成工具，可为文字、网址、公开图片或视频链接生成并下载 PNG 二维码，所有内容均在浏览器本地处理。',
+    keywords: '二维码生成,二维码在线生成,文字二维码,链接二维码,图片二维码,视频二维码',
+    canonical: `${siteUrl}tools/qrcode/`,
+    structuredData: applicationSchema('二维码生成工具 · Lstar Tools', `${siteUrl}tools/qrcode/`, '在浏览器本地为文字、网址和公开媒体链接生成二维码。', ['文字二维码', '网址二维码', '图片链接二维码', '视频链接二维码', 'PNG 下载']),
+  },
+  color: {
+    title: '颜色取色与转换 · Lstar Tools',
+    description: '免费的在线取色与颜色转换工具，支持 HEX、RGB、HSL、HSV、HWB 与透明度，修改任一种格式即可同步转换。',
+    keywords: '颜色转换,在线取色,HEX转RGB,RGB转HSL,HSV转换,HWB转换',
+    canonical: `${siteUrl}tools/color/`,
+    structuredData: applicationSchema('颜色取色与转换 · Lstar Tools', `${siteUrl}tools/color/`, '在浏览器本地取色，并同步转换 HEX、RGB、HSL、HSV、HWB 颜色代码。', ['系统取色盘', 'HEX 与 HEXA', 'RGB 与 HSL', 'HSV 与 HWB', '透明度保留']),
   },
 } satisfies Record<string, PageMetadata>

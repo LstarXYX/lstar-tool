@@ -41,6 +41,8 @@ export default defineConfig({
         urlCodec: resolve(projectRoot, 'tools/url-codec/index.html'),
         md5: resolve(projectRoot, 'tools/md5/index.html'),
         timestamp: resolve(projectRoot, 'tools/timestamp/index.html'),
+        qrcode: resolve(projectRoot, 'tools/qrcode/index.html'),
+        color: resolve(projectRoot, 'tools/color/index.html'),
       },
     },
   },

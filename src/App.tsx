@@ -6,10 +6,12 @@ import { JsonFormatterTool } from './features/json-formatter/JsonFormatterTool'
 import { UrlCodecTool } from './features/url-codec/UrlCodecTool'
 import { Md5Tool } from './features/md5/Md5Tool'
 import { TimestampTool } from './features/timestamp/TimestampTool'
+import { QrCodeTool } from './features/qrcode/QrCodeTool'
+import { ColorTool } from './features/color/ColorTool'
 import { pageMetadata } from './data/site'
 import { usePageMetadata } from './usePageMetadata'
 
-type View = 'home' | 'toolbox' | 'image-base64' | 'json' | 'url-codec' | 'md5' | 'timestamp'
+type View = 'home' | 'toolbox' | 'image-base64' | 'json' | 'url-codec' | 'md5' | 'timestamp' | 'qrcode' | 'color'
 type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
 const categories: Category[] = ['全部', '图片处理', '编码/解码', '开发辅助', '效率工具', '我的收藏']
@@ -23,6 +25,8 @@ const routeByView: Record<View, string> = {
   'url-codec': 'tools/url-codec/',
   md5: 'tools/md5/',
   timestamp: 'tools/timestamp/',
+  qrcode: 'tools/qrcode/',
+  color: 'tools/color/',
 }
 
 const getDeploymentBase = () => {
@@ -38,6 +42,8 @@ const getViewFromLocation = (): View => {
   if (path.endsWith('/tools/url-codec')) return 'url-codec'
   if (path.endsWith('/tools/md5')) return 'md5'
   if (path.endsWith('/tools/timestamp')) return 'timestamp'
+  if (path.endsWith('/tools/qrcode')) return 'qrcode'
+  if (path.endsWith('/tools/color')) return 'color'
   if (path.endsWith('/tools')) return 'toolbox'
   return 'home'
 }
@@ -54,6 +60,8 @@ const toolViewById: Record<string, View> = {
   'url-codec': 'url-codec',
   md5: 'md5',
   timestamp: 'timestamp',
+  qrcode: 'qrcode',
+  color: 'color',
 }
 
 function ToolCard({ tool, favourite, onOpen, onToggleFavourite }: { tool: ToolDefinition; favourite: boolean; onOpen: (id: string) => void; onToggleFavourite: (id: string) => void }) {
@@ -100,7 +108,7 @@ function App() {
   }
 
   const openTool = (id: string) => {
-    if (id === 'image-base64' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp') {
+    if (id === 'image-base64' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp' || id === 'qrcode' || id === 'color') {
       navigate(id)
     }
   }
@@ -128,6 +136,8 @@ function App() {
         {view === 'url-codec' && <UrlCodecTool onBack={showToolbox} />}
         {view === 'md5' && <Md5Tool onBack={showToolbox} />}
         {view === 'timestamp' && <TimestampTool onBack={showToolbox} />}
+        {view === 'qrcode' && <QrCodeTool onBack={showToolbox} />}
+        {view === 'color' && <ColorTool onBack={showToolbox} />}
         {view !== 'home' && view !== 'toolbox' && <aside className="related-tools" aria-label="相关工具"><h2>继续使用其他工具</h2><p>所有工具均在浏览器本地处理。</p><div>{tools.filter((tool) => tool.available && toolViewById[tool.id] !== view).map((tool) => <AppLink key={tool.id} view={toolViewById[tool.id]} onClick={() => navigate(toolViewById[tool.id])}>{tool.name}</AppLink>)}</div></aside>}
         {view === 'home' && <>
           <section className="hero">
