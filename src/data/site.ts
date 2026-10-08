@@ -129,4 +129,11 @@ export const pageMetadata = {
     canonical: `${siteUrl}tools/document-converter/`,
     structuredData: applicationSchema('Markdown 与 Word 文件转换 · Lstar Tools', `${siteUrl}tools/document-converter/`, '在浏览器本地转换 Markdown 和 Word 文档。', ['Markdown 转 Word', 'Word 转 Markdown', '本地文件处理']),
   },
+  'password-generator': {
+    title: '随机密码生成器 · Lstar Tools',
+    description: '免费的在线随机密码生成器。自定义密码长度和字符池，一次生成 10 个密码，支持复制和仅保存在当前浏览器的记录。',
+    keywords: '随机密码生成器,在线密码生成,强密码生成器,密码长度,密码字符,本地保存密码',
+    canonical: `${siteUrl}tools/password-generator/`,
+    structuredData: applicationSchema('随机密码生成器 · Lstar Tools', `${siteUrl}tools/password-generator/`, '在浏览器本地按自定义长度和字符池生成随机密码，并保存本地记录。', ['自定义密码长度', '数字与字母字符池', '特殊符号', '一次生成 10 个密码', '本地保存记录']),
+  },
 } satisfies Record<string, PageMetadata>

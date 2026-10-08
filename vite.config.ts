@@ -45,6 +45,7 @@ export default defineConfig({
         color: resolve(projectRoot, 'tools/color/index.html'),
         ocr: resolve(projectRoot, 'tools/ocr/index.html'),
         documentConverter: resolve(projectRoot, 'tools/document-converter/index.html'),
+        passwordGenerator: resolve(projectRoot, 'tools/password-generator/index.html'),
       },
     },
   },

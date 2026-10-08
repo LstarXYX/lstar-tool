@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Image, Braces, QrCode, Palette, Link2, Fingerprint, Clock3, ScanText, FileOutput } from 'lucide-react'
+import { Image, Braces, QrCode, Palette, Link2, Fingerprint, Clock3, ScanText, FileOutput, KeyRound } from 'lucide-react'
 
 export type ToolDefinition = {
   id: string
@@ -27,4 +27,5 @@ export const tools: ToolDefinition[] = [
   { id: 'color', name: '颜色转换', description: '取色并同步转换 HEX、RGB、HSL、HSV、HWB', icon: Palette, category: '图片处理', available: true },
   { id: 'ocr', name: '图片 OCR 识别', description: '基于 PaddleOCR WASM 在浏览器本地提取图片文字', icon: ScanText, category: '图片处理', available: true },
   { id: 'document-converter', name: 'Markdown / Word 转换', description: '在浏览器本地转换 Markdown 与 Word 文档', icon: FileOutput, category: '文件转换', available: true },
+  { id: 'password-generator', name: '随机密码生成器', description: '自定义字符池，批量生成并本地保存密码', icon: KeyRound, category: '效率工具', available: true },
 ]
