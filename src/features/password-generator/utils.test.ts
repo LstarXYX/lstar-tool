@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { characterGroups, createPasswords, uniqueCharacters } from './utils'
+import { characterGroups, createPasswords, getPasswordStrength, uniqueCharacters } from './utils'
 
 describe('uniqueCharacters', () => {
   it('keeps the first occurrence of each character', () => {
@@ -21,5 +21,16 @@ describe('createPasswords', () => {
   it('rejects an empty character pool and invalid length', () => {
     expect(() => createPasswords(4, '')).toThrow('请至少输入一个可选字符。')
     expect(() => createPasswords(0, 'a')).toThrow('密码长度至少为 1 位。')
+  })
+})
+
+describe('getPasswordStrength', () => {
+  it('identifies short or simple passwords as weak', () => {
+    expect(getPasswordStrength('123456').label).toBe('弱')
+    expect(getPasswordStrength('aaaaaaa!').label).toBe('弱')
+  })
+
+  it('rewards long passwords with mixed character types', () => {
+    expect(getPasswordStrength('A7!mQ2#xLp9$Vz4@').label).toBe('强')
   })
 })

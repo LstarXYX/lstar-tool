@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Check, Clipboard, History, KeyRound, RefreshCw, Save, Trash2 } from 'lucide-react'
-import { characterGroups, createPasswords, uniqueCharacters, type CharacterGroup } from './utils'
+import { characterGroups, createPasswords, getPasswordStrength, uniqueCharacters, type CharacterGroup } from './utils'
 
 type SavedPassword = { id: string; value: string; savedAt: string }
 
@@ -21,6 +21,11 @@ const readSavedPasswords = (): SavedPassword[] => {
 }
 
 const formatSavedAt = (value: string) => new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(value))
+
+function StrengthBadge({ password }: { password: string }) {
+  const strength = getPasswordStrength(password)
+  return <span className={`password-strength level-${strength.level}`} title={strength.description}><i aria-hidden="true"><b /><b /><b /><b /></i>{strength.label}</span>
+}
 
 export function PasswordGeneratorTool({ onBack }: { onBack: () => void }) {
   const [length, setLength] = useState(10)
@@ -73,9 +78,9 @@ export function PasswordGeneratorTool({ onBack }: { onBack: () => void }) {
         <button className="primary-button password-generate-button" type="button" onClick={generate}><KeyRound size={17} />生成 10 个密码</button>
         {message && <p className="simple-message" role="status">{message}</p>}
       </article>
-      <article className="password-results-card"><div className="simple-tool-heading"><span className="step-number">02</span><div><h2>可选密码</h2><p>复制后可直接使用，或保存到本机浏览器。</p></div></div><div className="password-results">{passwords.map((password, index) => <div className="password-result" key={`${password}-${index}`}><code>{password}</code><div><button type="button" aria-label={`复制密码 ${index + 1}`} onClick={() => copy(password, `result-${index}`)}>{copied === `result-${index}` ? <Check size={16} /> : <Clipboard size={16} />}</button><button type="button" aria-label={`保存密码 ${index + 1}`} onClick={() => save(password)}><Save size={16} /></button></div></div>)}</div></article>
+      <article className="password-results-card"><div className="simple-tool-heading"><span className="step-number">02</span><div><h2>可选密码</h2><p>复制后可直接使用，或保存到本机浏览器。</p></div></div><div className="password-results">{passwords.map((password, index) => <div className="password-result" key={`${password}-${index}`}><div className="password-result-value"><code>{password}</code><StrengthBadge password={password} /></div><div><button type="button" aria-label={`复制密码 ${index + 1}`} onClick={() => copy(password, `result-${index}`)}>{copied === `result-${index}` ? <Check size={16} /> : <Clipboard size={16} />}</button><button type="button" aria-label={`保存密码 ${index + 1}`} onClick={() => save(password)}><Save size={16} /></button></div></div>)}</div></article>
     </div>
-    <section className="password-history" aria-label="已保存密码"><div className="password-history-heading"><div><History size={18} /><div><h2>已保存密码</h2><p>仅保存在此浏览器的本地存储中。</p></div></div>{savedPasswords.length > 0 && <button className="text-button" type="button" onClick={clearSaved}><Trash2 size={16} />清空记录</button>}</div>{savedPasswords.length ? <div className="saved-password-list">{savedPasswords.map((item) => <div className="saved-password" key={item.id}><div><code>{item.value}</code><time dateTime={item.savedAt}>保存于 {formatSavedAt(item.savedAt)}</time></div><div><button type="button" aria-label="复制已保存密码" onClick={() => copy(item.value, item.id)}>{copied === item.id ? <Check size={16} /> : <Clipboard size={16} />}</button><button type="button" aria-label="删除已保存密码" onClick={() => setSavedPasswords((current) => current.filter((saved) => saved.id !== item.id))}><Trash2 size={16} /></button></div></div>)}</div> : <div className="password-history-empty"><History size={30} /><p>暂未保存密码。点击候选密码右侧的保存图标即可在这里查看。</p></div>}</section>
+    <section className="password-history" aria-label="已保存密码"><div className="password-history-heading"><div><History size={18} /><div><h2>已保存密码</h2><p>仅保存在此浏览器的本地存储中。</p></div></div>{savedPasswords.length > 0 && <button className="text-button" type="button" onClick={clearSaved}><Trash2 size={16} />清空记录</button>}</div>{savedPasswords.length ? <div className="saved-password-list">{savedPasswords.map((item) => <div className="saved-password" key={item.id}><div><code>{item.value}</code><div className="saved-password-meta"><StrengthBadge password={item.value} /><time dateTime={item.savedAt}>保存于 {formatSavedAt(item.savedAt)}</time></div></div><div><button type="button" aria-label="复制已保存密码" onClick={() => copy(item.value, item.id)}>{copied === item.id ? <Check size={16} /> : <Clipboard size={16} />}</button><button type="button" aria-label="删除已保存密码" onClick={() => setSavedPasswords((current) => current.filter((saved) => saved.id !== item.id))}><Trash2 size={16} /></button></div></div>)}</div> : <div className="password-history-empty"><History size={30} /><p>暂未保存密码。点击候选密码右侧的保存图标即可在这里查看。</p></div>}</section>
     <section className="tool-seo-content"><h2>在线随机密码生成器</h2><p>设置长度和可选字符后，一次生成 10 个随机密码。可直接编辑字符池，适合匹配不同网站或系统的密码规则。</p><h2>常见问题</h2><div className="faq-grid"><article><h3>密码会上传吗？</h3><p>不会。生成、复制和保存均在当前浏览器本地完成，本站不会接收密码。</p></article><article><h3>保存记录会一直保留吗？</h3><p>记录仅写入浏览器本地存储；清除浏览器缓存或本地网站数据后，记录会消失。</p></article><article><h3>如何生成更强的密码？</h3><p>建议增加密码长度，并同时使用数字、大小写字母和特殊符号。</p></article></div></section>
   </section>
 }
