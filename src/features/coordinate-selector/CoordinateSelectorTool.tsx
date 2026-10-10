@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState, type ChangeEvent, type DragEvent, type PointerEvent, type WheelEvent } from 'react'
-import { Check, Clipboard, Crosshair, ImageUp, MousePointer2, RefreshCw, Trash2, ZoomIn, ZoomOut } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type DragEvent, type PointerEvent, type WheelEvent } from 'react'
+import { Check, Clipboard, Crosshair, ImageUp, Maximize2, Minimize2, MousePointer2, RefreshCw, Trash2, ZoomIn, ZoomOut } from 'lucide-react'
 import { clamp, createRectBox, formatBoxes, rectToStyle, type Point, type RectBox } from './utils'
 
 type ImageInfo = { url: string; name: string; width: number; height: number }
 type Notice = { text: string; type: 'success' | 'error' } | null
+type ResizeHandle = 'northwest' | 'northeast' | 'southeast' | 'southwest'
 
 const minScale = 0.1
 const maxScale = 8
@@ -11,6 +12,7 @@ const maxScale = 8
 export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
+  const canvasCardRef = useRef<HTMLElement>(null)
   const [image, setImage] = useState<ImageInfo | null>(null)
   const [boxes, setBoxes] = useState<RectBox[]>([])
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -19,7 +21,17 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   const [draft, setDraft] = useState<{ start: Point; end: Point } | null>(null)
   const [panning, setPanning] = useState<{ startX: number; startY: number; panX: number; panY: number } | null>(null)
   const [movingBox, setMovingBox] = useState<{ index: number; start: Point; box: RectBox } | null>(null)
+  const [resizingBox, setResizingBox] = useState<{ index: number; start: Point; box: RectBox; handle: ResizeHandle } | null>(null)
   const [notice, setNotice] = useState<Notice>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const fitImageToViewport = useCallback(() => {
+    if (!image || !viewportRef.current) return
+    const { width, height } = viewportRef.current.getBoundingClientRect()
+    const fittedScale = Math.min(1, (width - 24) / image.width, (height - 24) / image.height)
+    setScale(fittedScale)
+    setPan({ x: (width - image.width * fittedScale) / 2, y: (height - image.height * fittedScale) / 2 })
+  }, [image])
 
   useEffect(() => {
     if (!notice) return
@@ -30,12 +42,17 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   useEffect(() => () => { if (image) URL.revokeObjectURL(image.url) }, [image])
 
   useEffect(() => {
-    if (!image || !viewportRef.current) return
-    const { width, height } = viewportRef.current.getBoundingClientRect()
-    const fittedScale = Math.min(1, (width - 24) / image.width, (height - 24) / image.height)
-    setScale(fittedScale)
-    setPan({ x: (width - image.width * fittedScale) / 2, y: (height - image.height * fittedScale) / 2 })
-  }, [image])
+    fitImageToViewport()
+  }, [fitImageToViewport])
+
+  useEffect(() => {
+    const updateFullscreen = () => {
+      setIsFullscreen(document.fullscreenElement === canvasCardRef.current)
+      window.requestAnimationFrame(fitImageToViewport)
+    }
+    document.addEventListener('fullscreenchange', updateFullscreen)
+    return () => document.removeEventListener('fullscreenchange', updateFullscreen)
+  }, [fitImageToViewport])
 
   useEffect(() => {
     const viewport = viewportRef.current
@@ -130,6 +147,25 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   }
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (resizingBox && image) {
+      const point = pointFromEvent(event)
+      if (!point) return
+      const [originalX1, originalY1, originalX2, originalY2] = resizingBox.box.box
+      const deltaX = point.x - resizingBox.start.x
+      const deltaY = point.y - resizingBox.start.y
+      let x1 = originalX1
+      let y1 = originalY1
+      let x2 = originalX2
+      let y2 = originalY2
+
+      if (resizingBox.handle === 'northwest' || resizingBox.handle === 'southwest') x1 = Math.round(clamp(originalX1 + deltaX, 0, originalX2 - 1))
+      if (resizingBox.handle === 'northeast' || resizingBox.handle === 'southeast') x2 = Math.round(clamp(originalX2 + deltaX, originalX1 + 1, image.width))
+      if (resizingBox.handle === 'northwest' || resizingBox.handle === 'northeast') y1 = Math.round(clamp(originalY1 + deltaY, 0, originalY2 - 1))
+      if (resizingBox.handle === 'southwest' || resizingBox.handle === 'southeast') y2 = Math.round(clamp(originalY2 + deltaY, originalY1 + 1, image.height))
+
+      setBoxes((current) => current.map((box, index) => index === resizingBox.index ? { type: 'rect', box: [x1, y1, x2, y2] } : box))
+      return
+    }
     if (movingBox && image) {
       const point = pointFromEvent(event)
       if (!point) return
@@ -151,6 +187,10 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   }
 
   const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (resizingBox) {
+      setResizingBox(null)
+      return
+    }
     if (movingBox) {
       setMovingBox(null)
       return
@@ -192,7 +232,12 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
 
   const changeScale = (factor: number) => setScaleAtViewportCenter(scale * factor)
 
-  const resetView = () => { setScale(1); setPan({ x: 0, y: 0 }) }
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement === canvasCardRef.current) await document.exitFullscreen()
+      else await canvasCardRef.current?.requestFullscreen()
+    } catch { showNotice('当前浏览器无法进入全屏标注模式。', 'error') }
+  }
   const copyBoxes = async () => {
     if (!boxes.length) return
     try {
@@ -202,28 +247,37 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   }
 
   const clearBoxes = () => { setBoxes([]); setSelectedIndex(null) }
+  const startResize = (event: PointerEvent<HTMLButtonElement>, index: number, box: RectBox, handle: ResizeHandle) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const point = pointFromEvent(event)
+    if (!point) return
+    viewportRef.current?.setPointerCapture(event.pointerId)
+    setSelectedIndex(index)
+    setResizingBox({ index, start: point, box, handle })
+  }
   const draftStyle = draft && image ? rectToStyle(createRectBox(draft.start, draft.end, image.width, image.height) ?? { type: 'rect', box: [draft.start.x, draft.start.y, draft.end.x, draft.end.y].map(Math.round) as RectBox['box'] }) : null
 
   return <section className="coordinate-workspace" aria-label="坐标框选工具">
     <div className="tool-intro">
       <div><button className="back-button" type="button" onClick={onBack}>← 返回工具箱</button><span className="eyebrow">IMAGE ANNOTATION</span><h1>坐标框选工具</h1><p>上传图片后用矩形框选区域。坐标按原图像素记录，缩放、平移不会影响导出结果。</p></div>
-      {image && <button className="text-button" type="button" onClick={resetView}><RefreshCw size={16} />重置视图</button>}
+      {image && <button className="text-button" type="button" onClick={fitImageToViewport}><RefreshCw size={16} />适合画布</button>}
     </div>
 
     {!image ? <div className="coordinate-upload dropzone" onDragOver={(event) => event.preventDefault()} onDrop={onDrop} onClick={() => inputRef.current?.click()} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') inputRef.current?.click() }}>
       <input ref={inputRef} type="file" accept="image/*" onChange={onFileChange} />
       <span className="upload-icon"><ImageUp size={25} /></span><strong>拖拽图片到这里，或点击上传</strong><span>图片只在当前浏览器中读取和处理</span>
     </div> : <div className="coordinate-layout">
-      <article className="coordinate-canvas-card">
-        <div className="coordinate-card-heading"><div><h2>{image.name}</h2><p>{image.width} × {image.height} px · 左键框选，中键拖动，滚轮缩放</p></div><span>{Math.round(scale * 100)}%</span></div>
+      <article className="coordinate-canvas-card" ref={canvasCardRef}>
+        <div className="coordinate-card-heading"><div><h2>{image.name}</h2><p>{image.width} × {image.height} px · 左键框选，中键拖动，滚轮缩放</p></div><div className="coordinate-card-actions"><span>{Math.round(scale * 100)}%</span><button type="button" onClick={toggleFullscreen} aria-label={isFullscreen ? '退出全屏标注' : '进入全屏标注'}>{isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button></div></div>
         <div className={`coordinate-viewport ${panning ? 'is-panning' : ''}`} ref={viewportRef} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onWheel={onWheel} onAuxClick={(event) => event.preventDefault()} onContextMenu={(event) => event.preventDefault()} onDragStart={(event) => event.preventDefault()}>
           <div className="coordinate-stage" style={{ width: image.width, height: image.height, transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}>
             <img src={image.url} alt="待框选图片" draggable="false" />
-            {boxes.map((box, index) => <button key={`${box.box.join('-')}-${index}`} className={`coordinate-box ${selectedIndex === index ? 'selected' : ''}`} type="button" style={rectToStyle(box)} onPointerDown={(event) => { event.preventDefault(); event.stopPropagation(); const point = pointFromEvent(event); if (point) { viewportRef.current?.setPointerCapture(event.pointerId); setSelectedIndex(index); setMovingBox({ index, start: point, box }) } }} onClick={(event) => event.stopPropagation()} aria-label={`选择并拖动矩形 ${index + 1}`}><span>{index + 1}</span></button>)}
+            {boxes.map((box, index) => <div key={`${box.box.join('-')}-${index}`} className={`coordinate-box ${selectedIndex === index ? 'selected' : ''}`} role="button" tabIndex={0} style={rectToStyle(box)} onPointerDown={(event) => { event.preventDefault(); event.stopPropagation(); const point = pointFromEvent(event); if (point) { viewportRef.current?.setPointerCapture(event.pointerId); setSelectedIndex(index); setMovingBox({ index, start: point, box }) } }} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelectedIndex(index) } }} aria-label={`选择并拖动矩形 ${index + 1}`}><span>{index + 1}</span>{(['northwest', 'northeast', 'southeast', 'southwest'] as ResizeHandle[]).map((handle) => <button key={handle} className={`coordinate-resize-handle ${handle}`} type="button" onPointerDown={(event) => startResize(event, index, box, handle)} aria-label={`调整矩形 ${index + 1} 的${handle === 'northwest' ? '左上' : handle === 'northeast' ? '右上' : handle === 'southeast' ? '右下' : '左下'}角`} />)}</div>)}
             {draftStyle && <div className="coordinate-box draft" style={draftStyle} />}
           </div>
         </div>
-        <div className="coordinate-canvas-controls"><button type="button" onClick={() => changeScale(.8)} aria-label="缩小"><ZoomOut size={16} /></button><label className="coordinate-zoom-control"><span>缩放</span><input type="range" min={minScale} max={maxScale} step="0.05" value={scale} onChange={(event) => setScaleAtViewportCenter(Number(event.target.value))} aria-label="缩放图片以精细框选" /><output>{Math.round(scale * 100)}%</output></label><button type="button" onClick={() => changeScale(1.25)} aria-label="放大"><ZoomIn size={16} /></button><span><MousePointer2 size={15} />拖动矩形可移动，按 Delete 或 Backspace 删除</span></div>
+        <div className="coordinate-canvas-controls"><button type="button" onClick={() => changeScale(.8)} aria-label="缩小"><ZoomOut size={16} /></button><label className="coordinate-zoom-control"><span>缩放</span><input type="range" min={minScale} max={maxScale} step="0.05" value={scale} onChange={(event) => setScaleAtViewportCenter(Number(event.target.value))} aria-label="缩放图片以精细框选" /><output>{Math.round(scale * 100)}%</output></label><button type="button" onClick={() => changeScale(1.25)} aria-label="放大"><ZoomIn size={16} /></button><span><MousePointer2 size={15} />拖动矩形可移动；拖动四角控制点可调整大小</span></div>
       </article>
       <aside className="coordinate-output-card">
         <div className="coordinate-card-heading"><div><h2>框选坐标</h2><p>{boxes.length ? `共 ${boxes.length} 个矩形` : '尚未框选区域'}</p></div><Crosshair size={20} /></div>
