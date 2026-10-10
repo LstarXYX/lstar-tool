@@ -73,6 +73,13 @@ export const pageMetadata = {
     canonical: `${siteUrl}tools/image-base64/`,
     structuredData: applicationSchema('图片与 Base64 互转 · Lstar Tools', `${siteUrl}tools/image-base64/`, '在浏览器本地将图片转换为 Base64，或将 Base64 转换为图片。', ['图片转 Base64', 'Base64 转图片', '本地处理', '预览与下载']),
   },
+  'coordinate-selector': {
+    title: '图片坐标框选工具 · Lstar Tools',
+    description: '免费的在线图片坐标框选工具。上传图片后可框选多个矩形区域，支持滚轮缩放、中键平移、快捷键删除和一键复制原图坐标。',
+    keywords: '图片坐标框选,图片标注,矩形框选,坐标提取,图片框选工具,目标检测标注',
+    canonical: `${siteUrl}tools/coordinate-selector/`,
+    structuredData: applicationSchema('图片坐标框选工具 · Lstar Tools', `${siteUrl}tools/coordinate-selector/`, '在浏览器本地框选图片区域，获取多个矩形的原图像素坐标。', ['多矩形框选', '原图像素坐标', '滚轮缩放与中键平移', '快捷键删除', 'JSON 坐标复制']),
+  },
   json: {
     title: 'JSON 格式化与结构编辑 · Lstar Tools',
     description: '免费的在线 JSON 格式化、压缩、转义和结构化编辑工具，在浏览器本地完成所有处理。',

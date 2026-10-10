@@ -9,13 +9,14 @@ import { TimestampTool } from './features/timestamp/TimestampTool'
 import { QrCodeTool } from './features/qrcode/QrCodeTool'
 import { ColorTool } from './features/color/ColorTool'
 import { PasswordGeneratorTool } from './features/password-generator/PasswordGeneratorTool'
+import { CoordinateSelectorTool } from './features/coordinate-selector/CoordinateSelectorTool'
 import { pageMetadata } from './data/site'
 import { usePageMetadata } from './usePageMetadata'
 
 const OcrTool = lazy(async () => ({ default: (await import('./features/ocr/OcrTool')).OcrTool }))
 const DocumentConverterTool = lazy(async () => ({ default: (await import('./features/document-converter/DocumentConverterTool')).DocumentConverterTool }))
 
-type View = 'home' | 'toolbox' | 'image-base64' | 'json' | 'url-codec' | 'md5' | 'timestamp' | 'qrcode' | 'color' | 'ocr' | 'document-converter' | 'password-generator'
+type View = 'home' | 'toolbox' | 'image-base64' | 'coordinate-selector' | 'json' | 'url-codec' | 'md5' | 'timestamp' | 'qrcode' | 'color' | 'ocr' | 'document-converter' | 'password-generator'
 type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
 const categories: Category[] = ['全部', '图片处理', '文件转换', '编码/解码', '开发辅助', '效率工具', '我的收藏']
@@ -25,6 +26,7 @@ const routeByView: Record<View, string> = {
   home: '',
   toolbox: 'tools/',
   'image-base64': 'tools/image-base64/',
+  'coordinate-selector': 'tools/coordinate-selector/',
   json: 'tools/json-formatter/',
   'url-codec': 'tools/url-codec/',
   md5: 'tools/md5/',
@@ -45,6 +47,7 @@ const getDeploymentBase = () => {
 const getViewFromLocation = (): View => {
   const path = window.location.pathname.replace(/\/+$/, '')
   if (path.endsWith('/tools/image-base64')) return 'image-base64'
+  if (path.endsWith('/tools/coordinate-selector')) return 'coordinate-selector'
   if (path.endsWith('/tools/json-formatter')) return 'json'
   if (path.endsWith('/tools/url-codec')) return 'url-codec'
   if (path.endsWith('/tools/md5')) return 'md5'
@@ -66,6 +69,7 @@ function AppLink({ view, children, className, onClick }: { view: View; children:
 
 const toolViewById: Record<string, View> = {
   'image-base64': 'image-base64',
+  'coordinate-selector': 'coordinate-selector',
   json: 'json',
   'url-codec': 'url-codec',
   md5: 'md5',
@@ -121,7 +125,7 @@ function App() {
   }
 
   const openTool = (id: string) => {
-    if (id === 'image-base64' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp' || id === 'qrcode' || id === 'color' || id === 'ocr' || id === 'document-converter' || id === 'password-generator') {
+    if (id === 'image-base64' || id === 'coordinate-selector' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp' || id === 'qrcode' || id === 'color' || id === 'ocr' || id === 'document-converter' || id === 'password-generator') {
       navigate(id)
     }
   }
@@ -145,6 +149,7 @@ function App() {
 
       <main>
         {view === 'image-base64' && <ImageBase64Tool onBack={showToolbox} />}
+        {view === 'coordinate-selector' && <CoordinateSelectorTool onBack={showToolbox} />}
         {view === 'json' && <JsonFormatterTool onBack={showToolbox} />}
         {view === 'url-codec' && <UrlCodecTool onBack={showToolbox} />}
         {view === 'md5' && <Md5Tool onBack={showToolbox} />}

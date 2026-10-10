@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1677ff" />
+    <meta name="description" content="免费的在线图片坐标框选工具。上传图片后可框选多个矩形区域，支持缩放、平移、快捷键删除和复制原图坐标。" />
+    <meta name="keywords" content="图片坐标框选,图片标注,矩形框选,坐标提取,图片框选工具,目标检测标注" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="{{SITE_URL}}tools/coordinate-selector/" />
+    <meta property="og:type" content="website" /><meta property="og:locale" content="zh_CN" /><meta property="og:site_name" content="Lstar Tools" />
+    <meta property="og:title" content="图片坐标框选工具 · Lstar Tools" /><meta property="og:description" content="在图片上框选多个矩形区域，获取原图像素坐标。" /><meta property="og:url" content="{{SITE_URL}}tools/coordinate-selector/" />
+    <meta name="twitter:card" content="summary" /><meta name="twitter:title" content="图片坐标框选工具 · Lstar Tools" /><meta name="twitter:description" content="在图片上框选多个矩形区域，获取原图像素坐标。" /><meta name="twitter:url" content="{{SITE_URL}}tools/coordinate-selector/" />
+    <title>图片坐标框选工具 · Lstar Tools</title>
+    <script id="page-structured-data" type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"图片坐标框选工具 · Lstar Tools","url":"{{SITE_URL}}tools/coordinate-selector/","description":"在浏览器本地框选图片区域，获取多个矩形的原图像素坐标。","applicationCategory":"DeveloperApplication","operatingSystem":"Web","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}</script>
+  </head>
+  <body>
+    <div id="root"><main id="static-content"><header><a href="../">返回 Lstar Tools 工具箱</a></header><h1>图片坐标框选工具</h1><p>上传图片后，用矩形框选一个或多个区域，复制可用于标注和程序处理的原图像素坐标。</p><section><h2>如何框选图片坐标</h2><ol><li>选择或拖拽一张图片上传。</li><li>在图片上按住左键并拖动，创建矩形框选。</li><li>用滚轮缩放、中键拖动画布；选中矩形后可用 Delete 或 Backspace 删除。</li><li>点击复制完整坐标数据，获得由矩形对象组成的 JSON 数组。</li></ol><h2>坐标格式</h2><p>每个矩形使用 <code>{"type":"rect","box":[x1,y1,x2,y2]}</code> 格式。坐标按原图像素记录，不会受缩放和平移影响。</p><h2>隐私说明</h2><p>图片读取、预览和坐标计算完全在当前浏览器中完成，文件不会上传或保存到服务器。</p></section><nav aria-label="相关工具"><a href="../image-base64/">图片与 Base64 互转</a> · <a href="../color/">颜色取色与转换</a> · <a href="../ocr/">图片 OCR 文字识别</a></nav></main></div>
+    <script type="module" src="../../src/main.tsx"></script>
+  </body>
+</html>

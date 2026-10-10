@@ -11,6 +11,7 @@
 ## 已实现工具
 
 - [**图片 / Base64 互转**](http://tool.lstarr.xyz/tools/image-base64/)：拖拽或选择图片生成 Base64；也可粘贴带或不带 `data:image/...;base64,` 前缀的内容生成图片。无前缀时默认按 JPG 解析，支持预览大图与下载。
+- [**图片坐标框选工具**](http://tool.lstarr.xyz/tools/coordinate-selector/)：上传图片后框选多个矩形区域；支持滚轮缩放、中键平移、Delete / Backspace 删除，并复制原图像素坐标。导出项格式为 `{"type":"rect","box":[x1,y1,x2,y2]}`。
 - [**二维码生成工具**](http://tool.lstarr.xyz/tools/qrcode/)：为文字、网址和公开的图片或视频链接生成并下载 PNG 二维码。二维码无法容纳普通媒体文件，因此媒体需先托管在可公开访问的位置。
 - [**颜色取色与转换**](http://tool.lstarr.xyz/tools/color/)：通过系统取色盘或输入代码选择颜色，实时同步 HEX、RGB、HSL、HSV、HWB 和透明度。
 - [**JSON 格式化**](http://tool.lstarr.xyz/tools/json-formatter/)：输入 JSON 后查看可折叠的树状节点；支持节点值编辑并回写到源文本，以及格式化、紧凑、转义、移除转义、全部折叠与展开。

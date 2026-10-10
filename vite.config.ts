@@ -37,6 +37,7 @@ export default defineConfig({
         home: resolve(projectRoot, 'index.html'),
         toolbox: resolve(projectRoot, 'tools/index.html'),
         imageBase64: resolve(projectRoot, 'tools/image-base64/index.html'),
+        coordinateSelector: resolve(projectRoot, 'tools/coordinate-selector/index.html'),
         jsonFormatter: resolve(projectRoot, 'tools/json-formatter/index.html'),
         urlCodec: resolve(projectRoot, 'tools/url-codec/index.html'),
         md5: resolve(projectRoot, 'tools/md5/index.html'),
