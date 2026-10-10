@@ -16,7 +16,11 @@ describe('createRectBox', () => {
 })
 
 describe('formatBoxes', () => {
-  it('exports the requested rectangle format', () => {
-    expect(formatBoxes([{ type: 'rect', box: [1, 2, 30, 40] }])).toBe('[\n  {\n    "type": "rect",\n    "box": [\n      1,\n      2,\n      30,\n      40\n    ]\n  }\n]')
+  it('exports names, name-based IDs, and bounding boxes', () => {
+    expect(formatBoxes([{ type: 'rect', name: 'person', box: [1, 2, 30, 40] }, { type: 'rect', name: 'person', box: [50, 60, 70, 80] }, { type: 'rect', name: 'car', box: [3, 4, 5, 6] }])).toBe('[\n  {\n    "type": "rect",\n    "name": "person",\n    "id": "person_1",\n    "bbox": [\n      1,\n      2,\n      30,\n      40\n    ]\n  },\n  {\n    "type": "rect",\n    "name": "person",\n    "id": "person_2",\n    "bbox": [\n      50,\n      60,\n      70,\n      80\n    ]\n  },\n  {\n    "type": "rect",\n    "name": "car",\n    "id": "car_1",\n    "bbox": [\n      3,\n      4,\n      5,\n      6\n    ]\n  }\n]')
+  })
+
+  it('uses object when a name is empty', () => {
+    expect(formatBoxes([{ type: 'rect', name: '  ', box: [1, 2, 3, 4] }])).toContain('"id": "object_1"')
   })
 })

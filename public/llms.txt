@@ -10,7 +10,7 @@
 ## 已实现工具
 
 - [图片与 Base64 互转]({{SITE_URL}}tools/image-base64/)：图片转 Base64，或 Base64 转图片；支持预览、复制和下载。
-- [图片坐标框选工具]({{SITE_URL}}tools/coordinate-selector/)：在图片上框选多个矩形区域，支持全屏标注、滚轮缩放、中键平移、拖动矩形移动位置、拖动四角调整大小、快捷键删除，并复制原图像素坐标 JSON。
+- [图片坐标框选工具]({{SITE_URL}}tools/coordinate-selector/)：在图片上框选多个矩形区域，可清除图片后重新上传；支持全屏标注、滚轮缩放、中键平移、移动与调整矩形、快捷键删除，并复制包含 type、name、按名称编号的 id 和 bbox 原图像素坐标的 JSON。
 - [二维码生成工具]({{SITE_URL}}tools/qrcode/)：为文字、网址和公开图片或视频链接生成可下载的 PNG 二维码；二维码无法直接容纳普通媒体文件。
 - [颜色取色与转换]({{SITE_URL}}tools/color/)：使用取色盘或颜色代码，在 HEX、RGB、HSL、HSV、HWB 与透明度之间同步转换。
 - [JSON 格式化与结构编辑]({{SITE_URL}}tools/json-formatter/)：格式化、压缩、转义、移除转义以及树状结构编辑 JSON。

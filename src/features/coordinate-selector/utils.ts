@@ -3,6 +3,10 @@ export type RectBox = {
   box: [number, number, number, number]
 }
 
+export type AnnotationBox = RectBox & {
+  name: string
+}
+
 export type Point = {
   x: number
   y: number
@@ -34,4 +38,13 @@ export const rectToStyle = ({ box }: RectBox) => {
   return { left: x1, top: y1, width: x2 - x1, height: y2 - y1 }
 }
 
-export const formatBoxes = (boxes: RectBox[]) => JSON.stringify(boxes, null, 2)
+export const formatBoxes = (boxes: AnnotationBox[]) => {
+  const names = new Map<string, number>()
+  const annotations = boxes.map(({ type, name, box }) => {
+    const normalizedName = name.trim() || 'object'
+    const nextIndex = (names.get(normalizedName) ?? 0) + 1
+    names.set(normalizedName, nextIndex)
+    return { type, name: normalizedName, id: `${normalizedName}_${nextIndex}`, bbox: box }
+  })
+  return JSON.stringify(annotations, null, 2)
+}
