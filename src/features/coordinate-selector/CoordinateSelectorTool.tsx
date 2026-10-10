@@ -18,6 +18,7 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [draft, setDraft] = useState<{ start: Point; end: Point } | null>(null)
   const [panning, setPanning] = useState<{ startX: number; startY: number; panX: number; panY: number } | null>(null)
+  const [movingBox, setMovingBox] = useState<{ index: number; start: Point; box: RectBox } | null>(null)
   const [notice, setNotice] = useState<Notice>(null)
 
   useEffect(() => {
@@ -34,6 +35,14 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
     const fittedScale = Math.min(1, (width - 24) / image.width, (height - 24) / image.height)
     setScale(fittedScale)
     setPan({ x: (width - image.width * fittedScale) / 2, y: (height - image.height * fittedScale) / 2 })
+  }, [image])
+
+  useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+    const preventPageScroll = (event: globalThis.WheelEvent) => event.preventDefault()
+    viewport.addEventListener('wheel', preventPageScroll, { passive: false })
+    return () => viewport.removeEventListener('wheel', preventPageScroll)
   }, [image])
 
   useEffect(() => {
@@ -89,7 +98,7 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
     if (file) readFile(file)
   }
 
-  const pointFromEvent = (event: PointerEvent<HTMLDivElement> | WheelEvent<HTMLDivElement>): Point | null => {
+  const pointFromEvent = (event: { clientX: number; clientY: number }): Point | null => {
     if (!image || !viewportRef.current) return null
     const bounds = viewportRef.current.getBoundingClientRect()
     return {
@@ -114,12 +123,24 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
     if (event.button !== 0) return
     const point = pointFromEvent(event)
     if (!point) return
+    event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
     setSelectedIndex(null)
     setDraft({ start: point, end: point })
   }
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (movingBox && image) {
+      const point = pointFromEvent(event)
+      if (!point) return
+      const [x1, y1, x2, y2] = movingBox.box.box
+      const width = x2 - x1
+      const height = y2 - y1
+      const nextX = Math.round(clamp(x1 + point.x - movingBox.start.x, 0, image.width - width))
+      const nextY = Math.round(clamp(y1 + point.y - movingBox.start.y, 0, image.height - height))
+      setBoxes((current) => current.map((box, index) => index === movingBox.index ? { type: 'rect', box: [nextX, nextY, nextX + width, nextY + height] } : box))
+      return
+    }
     if (panning) {
       setPan({ x: panning.panX + event.clientX - panning.startX, y: panning.panY + event.clientY - panning.startY })
       return
@@ -130,6 +151,10 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   }
 
   const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (movingBox) {
+      setMovingBox(null)
+      return
+    }
     if (panning) {
       setPanning(null)
       return
@@ -156,14 +181,16 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
     setPan({ x: pointerX - anchor.x * nextScale, y: pointerY - anchor.y * nextScale })
   }
 
-  const changeScale = (factor: number) => {
+  const setScaleAtViewportCenter = (nextScale: number) => {
     if (!image || !viewportRef.current) return
     const bounds = viewportRef.current.getBoundingClientRect()
     const anchor = { x: (bounds.width / 2 - pan.x) / scale, y: (bounds.height / 2 - pan.y) / scale }
-    const nextScale = clamp(scale * factor, minScale, maxScale)
-    setScale(nextScale)
-    setPan({ x: bounds.width / 2 - anchor.x * nextScale, y: bounds.height / 2 - anchor.y * nextScale })
+    const clampedScale = clamp(nextScale, minScale, maxScale)
+    setScale(clampedScale)
+    setPan({ x: bounds.width / 2 - anchor.x * clampedScale, y: bounds.height / 2 - anchor.y * clampedScale })
   }
+
+  const changeScale = (factor: number) => setScaleAtViewportCenter(scale * factor)
 
   const resetView = () => { setScale(1); setPan({ x: 0, y: 0 }) }
   const copyBoxes = async () => {
@@ -189,14 +216,14 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
     </div> : <div className="coordinate-layout">
       <article className="coordinate-canvas-card">
         <div className="coordinate-card-heading"><div><h2>{image.name}</h2><p>{image.width} × {image.height} px · 左键框选，中键拖动，滚轮缩放</p></div><span>{Math.round(scale * 100)}%</span></div>
-        <div className={`coordinate-viewport ${panning ? 'is-panning' : ''}`} ref={viewportRef} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onWheel={onWheel}>
+        <div className={`coordinate-viewport ${panning ? 'is-panning' : ''}`} ref={viewportRef} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onWheel={onWheel} onAuxClick={(event) => event.preventDefault()} onContextMenu={(event) => event.preventDefault()} onDragStart={(event) => event.preventDefault()}>
           <div className="coordinate-stage" style={{ width: image.width, height: image.height, transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}>
             <img src={image.url} alt="待框选图片" draggable="false" />
-            {boxes.map((box, index) => <button key={`${box.box.join('-')}-${index}`} className={`coordinate-box ${selectedIndex === index ? 'selected' : ''}`} type="button" style={rectToStyle(box)} onPointerDown={(event) => { event.stopPropagation(); setSelectedIndex(index) }} onClick={(event) => event.stopPropagation()} aria-label={`选择框选 ${index + 1}`}><span>{index + 1}</span></button>)}
+            {boxes.map((box, index) => <button key={`${box.box.join('-')}-${index}`} className={`coordinate-box ${selectedIndex === index ? 'selected' : ''}`} type="button" style={rectToStyle(box)} onPointerDown={(event) => { event.preventDefault(); event.stopPropagation(); const point = pointFromEvent(event); if (point) { viewportRef.current?.setPointerCapture(event.pointerId); setSelectedIndex(index); setMovingBox({ index, start: point, box }) } }} onClick={(event) => event.stopPropagation()} aria-label={`选择并拖动矩形 ${index + 1}`}><span>{index + 1}</span></button>)}
             {draftStyle && <div className="coordinate-box draft" style={draftStyle} />}
           </div>
         </div>
-        <div className="coordinate-canvas-controls"><button type="button" onClick={() => changeScale(.8)} aria-label="缩小"><ZoomOut size={16} /></button><button type="button" onClick={() => changeScale(1.25)} aria-label="放大"><ZoomIn size={16} /></button><span><MousePointer2 size={15} />框选后可点击选中，按 Delete 或 Backspace 删除</span></div>
+        <div className="coordinate-canvas-controls"><button type="button" onClick={() => changeScale(.8)} aria-label="缩小"><ZoomOut size={16} /></button><label className="coordinate-zoom-control"><span>缩放</span><input type="range" min={minScale} max={maxScale} step="0.05" value={scale} onChange={(event) => setScaleAtViewportCenter(Number(event.target.value))} aria-label="缩放图片以精细框选" /><output>{Math.round(scale * 100)}%</output></label><button type="button" onClick={() => changeScale(1.25)} aria-label="放大"><ZoomIn size={16} /></button><span><MousePointer2 size={15} />拖动矩形可移动，按 Delete 或 Backspace 删除</span></div>
       </article>
       <aside className="coordinate-output-card">
         <div className="coordinate-card-heading"><div><h2>框选坐标</h2><p>{boxes.length ? `共 ${boxes.length} 个矩形` : '尚未框选区域'}</p></div><Crosshair size={20} /></div>
