@@ -15,7 +15,7 @@
 - [颜色取色与转换]({{SITE_URL}}tools/color/)：使用取色盘或颜色代码，在 HEX、RGB、HSL、HSV、HWB 与透明度之间同步转换。
 - [JSON 格式化与结构编辑]({{SITE_URL}}tools/json-formatter/)：格式化、压缩、转义、移除转义以及树状结构编辑 JSON。
 - [URL 编码解码]({{SITE_URL}}tools/url-codec/)：编码或解码 URL、查询参数与文本，支持中文和特殊字符。
-- [MD5 加密]({{SITE_URL}}tools/md5/)：生成 32 位、16 位及大小写 MD5 摘要。
+- [MD5 加密]({{SITE_URL}}tools/md5/)：生成文本的 32 位、16 位及大小写 MD5 摘要，并支持本地文件 MD5 计算。
 - [时间戳转换]({{SITE_URL}}tools/timestamp/)：在秒级、毫秒级时间戳与日期时间格式之间转换。
 - [随机密码生成器]({{SITE_URL}}tools/password-generator/)：按自定义长度和字符池一次生成 10 个密码；可复制或保存密码及保存时间到当前浏览器，清除缓存后记录消失。
 - [图片 OCR 文字识别]({{SITE_URL}}tools/ocr/)：基于 PaddleOCR 与 WebAssembly 在浏览器本地识别图片中的中英文文字；可选极速 PP-OCRv6 Tiny 或标准 PP-OCRv5 模式，模型与运行时随站点部署，仅在开始识别时从本站按需加载。

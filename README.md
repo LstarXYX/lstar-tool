@@ -16,7 +16,7 @@
 - [**颜色取色与转换**](http://tool.lstarr.xyz/tools/color/)：通过系统取色盘或输入代码选择颜色，实时同步 HEX、RGB、HSL、HSV、HWB 和透明度。
 - [**JSON 格式化**](http://tool.lstarr.xyz/tools/json-formatter/)：输入 JSON 后查看可折叠的树状节点；支持节点值编辑并回写到源文本，以及格式化、紧凑、转义、移除转义、全部折叠与展开。
 - [**URL 编码解码**](http://tool.lstarr.xyz/tools/url-codec/)：在浏览器本地对 URL、查询参数及任意文本进行百分号编码或解码，解码时兼容查询字符串中的加号空格。
-- [**MD5 加密**](http://tool.lstarr.xyz/tools/md5/)：实时生成 32 位、16 位及大小写四种 MD5 摘要，每项结果均可一键复制。
+- [**MD5 加密**](http://tool.lstarr.xyz/tools/md5/)：实时生成文本的 32 位、16 位及大小写四种 MD5 摘要；也可拖拽或选择文件，在浏览器本地分块计算标准 32 位小写 MD5。
 - [**时间戳转换**](http://tool.lstarr.xyz/tools/timestamp/)：在秒级或默认毫秒级时间戳与年月日时分秒之间双向转换，支持复制标准、斜杠、中文、ISO 8601 等日期格式。
 - [**随机密码生成器**](http://tool.lstarr.xyz/tools/password-generator/)：自定义密码长度与字符池，一次生成 10 个密码；可复制，或仅保存密码及保存时间到当前浏览器本地存储。
 - [**图片 OCR 文字识别**](http://tool.lstarr.xyz/tools/ocr/)：基于 PaddleOCR 和 WebAssembly，在浏览器本地识别图片中的中英文文字；可选极速 PP-OCRv6 Tiny 或标准 PP-OCRv5 模式，模型与运行时均随站点部署、按需从本站加载。

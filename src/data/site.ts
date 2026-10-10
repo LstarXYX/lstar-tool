@@ -96,10 +96,10 @@ export const pageMetadata = {
   },
   md5: {
     title: 'MD5 加密 · Lstar Tools',
-    description: '免费的在线 MD5 加密工具，可生成大写、小写、32 位和 16 位摘要，并支持一键复制。',
-    keywords: 'MD5加密,MD5在线加密,32位MD5,16位MD5,MD5大写',
+    description: '免费的在线 MD5 工具，支持文本和本地文件 MD5 计算，可生成大写、小写、32 位和 16 位摘要。',
+    keywords: 'MD5加密,文件MD5,MD5在线计算,32位MD5,16位MD5,MD5大写',
     canonical: `${siteUrl}tools/md5/`,
-    structuredData: applicationSchema('MD5 加密 · Lstar Tools', `${siteUrl}tools/md5/`, '在浏览器本地生成 32 位、16 位及大小写 MD5 摘要。', ['MD5 摘要', '32 位 MD5', '16 位 MD5', '一键复制']),
+    structuredData: applicationSchema('MD5 加密 · Lstar Tools', `${siteUrl}tools/md5/`, '在浏览器本地计算文本和文件的 MD5 摘要。', ['文本 MD5', '文件 MD5', '32 位 MD5', '16 位 MD5', '一键复制']),
   },
   timestamp: {
     title: '时间戳转换 · Lstar Tools',
