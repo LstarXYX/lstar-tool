@@ -1,6 +1,7 @@
 import { type ChangeEvent, type DragEvent, useMemo, useRef, useState } from 'react'
 import { Check, Clipboard, FileUp, Fingerprint, RotateCcw } from 'lucide-react'
 import { getMd5Variants, md5File } from './utils'
+import { writeClipboardText } from '../../platform/clipboard'
 
 const labels = [
   ['lower32', '32 位小写'], ['upper32', '32 位大写'], ['lower16', '16 位小写'], ['upper16', '16 位大写'],
@@ -16,7 +17,7 @@ export function Md5Tool({ onBack }: { onBack: () => void }) {
   const calculationId = useRef(0)
   const results = useMemo(() => getMd5Variants(input), [input])
   const copy = async (id: string, value: string) => {
-    try { await navigator.clipboard.writeText(value); setCopied(id); window.setTimeout(() => setCopied(''), 1500) } catch { setCopied('copy-error') }
+    try { await writeClipboardText(value); setCopied(id); window.setTimeout(() => setCopied(''), 1500) } catch { setCopied('copy-error') }
   }
   const selectFile = async (file: File) => {
     const currentCalculation = ++calculationId.current

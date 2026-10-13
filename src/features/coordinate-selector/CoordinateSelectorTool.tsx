@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type DragEvent, type PointerEvent, type WheelEvent } from 'react'
 import { Check, Clipboard, Crosshair, ImageUp, Maximize2, Minimize2, MousePointer2, RefreshCw, Trash2, ZoomIn, ZoomOut } from 'lucide-react'
 import { clamp, createRectBox, formatBoxes, rectToStyle, type AnnotationBox, type Point, type RectBox } from './utils'
+import { writeClipboardText } from '../../platform/clipboard'
 
 type ImageInfo = { url: string; name: string; width: number; height: number }
 type Notice = { text: string; type: 'success' | 'error' } | null
@@ -241,7 +242,7 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   const copyBoxes = async () => {
     if (!boxes.length) return
     try {
-      await navigator.clipboard.writeText(formatBoxes(boxes))
+      await writeClipboardText(formatBoxes(boxes))
       showNotice('完整坐标数据已复制。', 'success')
     } catch { showNotice('复制失败，请手动复制。', 'error') }
   }

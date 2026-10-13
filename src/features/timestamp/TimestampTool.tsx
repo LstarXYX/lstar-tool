@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Check, Clipboard, Clock3, RotateCcw } from 'lucide-react'
 import { dateToLocalInput, dateToTimestamp, getDateFormats, timestampToDate, type TimestampUnit } from './utils'
+import { writeClipboardText } from '../../platform/clipboard'
 
 const unitLabel: Record<TimestampUnit, string> = { milliseconds: '毫秒级（默认）', seconds: '秒级' }
 
@@ -18,7 +19,7 @@ export function TimestampTool({ onBack }: { onBack: () => void }) {
     try { return { value: dateToTimestamp(dateInput, dateUnit), error: '' } } catch (error) { return { value: null, error: error instanceof Error ? error.message : '转换失败。' } }
   }, [dateInput, dateUnit])
   const copy = async (id: string, value: string) => {
-    try { await navigator.clipboard.writeText(value); setCopied(id); window.setTimeout(() => setCopied(''), 1500) } catch { setCopied('copy-error') }
+    try { await writeClipboardText(value); setCopied(id); window.setTimeout(() => setCopied(''), 1500) } catch { setCopied('copy-error') }
   }
   const resetNow = () => {
     const current = new Date()

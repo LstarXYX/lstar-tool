@@ -1,6 +1,6 @@
 # Lstar Tools
 
-一个面向开发者的轻量在线工具箱。所有现有工具均在浏览器本地运行，不上传图片、JSON 或其他输入内容。
+一个面向开发者的轻量工具箱。网页与桌面端均在本地处理内容，不上传图片、JSON 或其他输入内容。
 
 在线访问：[Lstar Tools](http://tool.lstarr.xyz/)
 
@@ -34,6 +34,27 @@
 npm install
 npm run dev
 ```
+
+## 桌面端（Tauri）
+
+桌面端使用 Tauri 2 封装同一套 React 前端，不会影响现有 GitHub Pages 构建。Windows 首发版本默认离线运行，OCR 模型会随应用打包；生成文件时会打开系统保存对话框。
+
+准备好 Rust、MSVC Build Tools 与 WebView2 后，执行：
+
+```bash
+npm install
+npm run dev:desktop
+```
+
+创建 Windows 安装包：
+
+```bash
+npm run build:desktop
+```
+
+安装包会输出到 `src-tauri/target/release/bundle/`（或由 `CARGO_TARGET_DIR` 指定的目录）。桌面端构建输出 `dist-desktop/`，不会提交到 Git。
+
+网页与桌面端共用 `src/` 中的工具实现；运行环境差异集中于 `src/platform/`：网页使用浏览器下载与剪贴板 API，桌面端使用受权限控制的系统保存对话框、剪贴板和外部浏览器。桌面端路由使用 Hash 路由，网页端继续保留 SEO 所需的静态工具页路径。
 
 ### OCR CDN（可选）
 

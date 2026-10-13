@@ -6,12 +6,22 @@
   "scripts": {
     "dev": "node ./node_modules/vite/bin/vite.js",
     "build": "node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build",
+    "build:web": "npm run build",
+    "dev:desktop:frontend": "node ./node_modules/vite/bin/vite.js --config vite.desktop.config.ts",
+    "build:desktop:frontend": "node ./node_modules/typescript/bin/tsc -b && node ./node_modules/vite/bin/vite.js build --config vite.desktop.config.ts",
+    "dev:desktop": "node ./node_modules/@tauri-apps/cli/tauri.js dev",
+    "build:desktop": "node ./node_modules/@tauri-apps/cli/tauri.js build",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "test": "node ./node_modules/vitest/vitest.mjs run",
     "postinstall": "node ./scripts/patch-paddleocr-timeout.mjs"
   },
   "dependencies": {
     "@paddleocr/paddleocr-js": "^0.4.2",
+    "@tauri-apps/api": "^2.12.3",
+    "@tauri-apps/plugin-clipboard-manager": "^2.4.2",
+    "@tauri-apps/plugin-dialog": "^2.8.2",
+    "@tauri-apps/plugin-fs": "^2.7.0",
+    "@tauri-apps/plugin-opener": "^2.7.1",
     "@vitejs/plugin-react": "latest",
     "docx": "^9.8.1",
     "lucide-react": "latest",
@@ -23,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "latest",
+    "@tauri-apps/cli": "^2.12.2",
     "@types/node": "latest",
     "@types/qrcode": "^1.5.6",
     "@types/react": "latest",

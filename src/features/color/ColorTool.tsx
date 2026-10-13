@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Check, Clipboard, Palette, RotateCcw } from 'lucide-react'
+import { writeClipboardText } from '../../platform/clipboard'
 import { colorFormats, parseColor, toOpaqueHex, type RgbaColor } from './utils'
 
 const initialColor: RgbaColor = { r: 40, g: 126, b: 243, a: 1 }
@@ -25,7 +26,7 @@ export function ColorTool({ onBack }: { onBack: () => void }) {
     else setError('颜色代码格式不正确，请检查后继续输入。')
   }
   const copy = async (key: keyof typeof formats) => {
-    try { await navigator.clipboard.writeText(formats[key]); setCopied(key); window.setTimeout(() => setCopied(''), 1500) } catch { setError('复制失败，请手动复制颜色代码。') }
+    try { await writeClipboardText(formats[key]); setCopied(key); window.setTimeout(() => setCopied(''), 1500) } catch { setError('复制失败，请手动复制颜色代码。') }
   }
   const reset = () => applyColor(initialColor)
 

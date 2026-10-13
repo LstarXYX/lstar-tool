@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { Clipboard, FileImage, ImageUp, LoaderCircle, Maximize2, RefreshCw, ScanText, X } from 'lucide-react'
 import { defaultOcrRuntimeConfig, disposeOcrRuntime, ocrModes, recognizeImage, type OcrModelSource, type OcrMode, type OcrRecognition, type OcrRuntimeConfig, type OcrWasmSource } from './core/paddleOcr'
+import { writeClipboardText } from '../../platform/clipboard'
+import { isDesktopApp } from '../../platform/runtime'
 
 type Notice = { text: string; type: 'success' | 'error' } | null
 const runtimeConfigKey = 'lstar-tools:ocr-runtime-config'
@@ -16,6 +18,7 @@ const getSavedRuntimeConfig = (): OcrRuntimeConfig => {
 const bytesToLabel = (bytes: number) => bytes < 1024 * 1024 ? `${Math.ceil(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`
 
 export function OcrTool({ onBack }: { onBack: () => void }) {
+  const desktopApp = isDesktopApp()
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
@@ -63,7 +66,7 @@ export function OcrTool({ onBack }: { onBack: () => void }) {
   const text = result?.lines.map((line) => line.text).join('\n') ?? ''
   const copyResult = async () => {
     if (!text) return
-    try { await navigator.clipboard.writeText(text); setNotice({ text: '识别文本已复制。', type: 'success' }) } catch { setNotice({ text: '复制失败，请手动选择文本。', type: 'error' }) }
+    try { await writeClipboardText(text); setNotice({ text: '识别文本已复制。', type: 'success' }) } catch { setNotice({ text: '复制失败，请手动选择文本。', type: 'error' }) }
   }
   const reset = () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
@@ -110,7 +113,7 @@ export function OcrTool({ onBack }: { onBack: () => void }) {
       <article className="ocr-card"><div className="card-heading"><span className="step-number">01</span><div><h2>上传图片</h2><p>支持拖拽，图片不会上传到本站服务器。</p></div></div>
         <div className="dropzone ocr-dropzone" onDragOver={(event) => event.preventDefault()} onDrop={(event: DragEvent<HTMLDivElement>) => { event.preventDefault(); const dropped = event.dataTransfer.files?.[0]; if (dropped) chooseFile(dropped) }} onClick={() => inputRef.current?.click()} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') inputRef.current?.click() }}><input ref={inputRef} type="file" accept="image/*" onChange={(event: ChangeEvent<HTMLInputElement>) => { const selected = event.target.files?.[0]; if (selected) chooseFile(selected) }} /><span className="upload-icon"><ImageUp size={24} /></span><strong>拖拽图片到这里，或点击上传</strong><span>PNG、JPG、WebP、BMP 等常见图片格式</span></div>
         <fieldset className="ocr-mode-selector"><legend>识别模式</legend>{(Object.keys(ocrModes) as OcrMode[]).map((item) => <label key={item}><input type="radio" name="ocr-mode" value={item} checked={mode === item} onChange={() => { setMode(item); setResult(null) }} disabled={loading || switchingRuntime} /><span><b>{ocrModes[item].name}</b><small>{ocrModes[item].description}</small></span></label>)}</fieldset>
-        <fieldset className="ocr-runtime-selector"><legend>资源加载配置</legend><label>模型来源<select value={runtimeConfig.modelSource} disabled={loading || switchingRuntime} onChange={(event) => void changeRuntimeConfig('modelSource', event.target.value as OcrModelSource)}><option value="site">本站资源</option><option value="paddle">Paddle 官方 CDN</option><option value="custom">自定义 CDN</option></select></label><label>WASM 来源<select value={runtimeConfig.wasmSource} disabled={loading || switchingRuntime} onChange={(event) => void changeRuntimeConfig('wasmSource', event.target.value as OcrWasmSource)}><option value="site">本站资源</option><option value="jsdelivr">jsDelivr CDN</option><option value="custom">自定义 CDN</option></select></label>{runtimeConfig.modelSource === 'custom' && <label className="ocr-custom-url">模型 CDN 基址<input type="url" inputMode="url" placeholder="https://cdn.example.com/ocr/ 或 /ocr-assets/" defaultValue={runtimeConfig.customModelBaseUrl} disabled={loading || switchingRuntime} onBlur={(event) => void saveCustomUrl('customModelBaseUrl', event.target.value)} /></label>}{runtimeConfig.wasmSource === 'custom' && <label className="ocr-custom-url">WASM CDN 基址<input type="url" inputMode="url" placeholder="https://cdn.example.com/ort/ 或 /ort-assets/" defaultValue={runtimeConfig.customWasmBaseUrl} disabled={loading || switchingRuntime} onBlur={(event) => void saveCustomUrl('customWasmBaseUrl', event.target.value)} /></label>}{switchingRuntime && <small>正在切换资源配置…</small>}</fieldset>
+        {!desktopApp && <fieldset className="ocr-runtime-selector"><legend>资源加载配置</legend><label>模型来源<select value={runtimeConfig.modelSource} disabled={loading || switchingRuntime} onChange={(event) => void changeRuntimeConfig('modelSource', event.target.value as OcrModelSource)}><option value="site">本站资源</option><option value="paddle">Paddle 官方 CDN</option><option value="custom">自定义 CDN</option></select></label><label>WASM 来源<select value={runtimeConfig.wasmSource} disabled={loading || switchingRuntime} onChange={(event) => void changeRuntimeConfig('wasmSource', event.target.value as OcrWasmSource)}><option value="site">本站资源</option><option value="jsdelivr">jsDelivr CDN</option><option value="custom">自定义 CDN</option></select></label>{runtimeConfig.modelSource === 'custom' && <label className="ocr-custom-url">模型 CDN 基址<input type="url" inputMode="url" placeholder="https://cdn.example.com/ocr/ 或 /ocr-assets/" defaultValue={runtimeConfig.customModelBaseUrl} disabled={loading || switchingRuntime} onBlur={(event) => void saveCustomUrl('customModelBaseUrl', event.target.value)} /></label>}{runtimeConfig.wasmSource === 'custom' && <label className="ocr-custom-url">WASM CDN 基址<input type="url" inputMode="url" placeholder="https://cdn.example.com/ort/ 或 /ort-assets/" defaultValue={runtimeConfig.customWasmBaseUrl} disabled={loading || switchingRuntime} onBlur={(event) => void saveCustomUrl('customWasmBaseUrl', event.target.value)} /></label>}{switchingRuntime && <small>正在切换资源配置…</small>}</fieldset>}
         {file && <div className="file-meta"><FileImage size={18} /><span>{file.name}</span><small>{bytesToLabel(file.size)}</small></div>}
         {previewUrl && <button className="ocr-preview-button" type="button" onClick={() => setIsViewerOpen(true)} aria-label="放大查看待识别图片"><img className="ocr-preview" src={previewUrl} alt="待识别图片预览" /><span><Maximize2 size={16} />放大查看</span></button>}
         <button className="primary-button ocr-run-button" type="button" disabled={!file || loading} onClick={() => void recognize()}>{loading ? <LoaderCircle className="spin" size={17} /> : <ScanText size={17} />}{loading ? '正在加载模型并识别…' : '开始识别'}</button>

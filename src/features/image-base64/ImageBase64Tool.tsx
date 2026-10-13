@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { Check, Clipboard, Download, FileImage, ImageUp, Maximize2, RefreshCw, Trash2, Upload, X } from 'lucide-react'
 import { base64ToBlob, base64ToDataUrl, isValidBase64 } from './utils'
+import { writeClipboardText } from '../../platform/clipboard'
+import { saveBlob } from '../../platform/files'
 
 type Notice = { text: string; type: 'success' | 'error' } | null
 
@@ -78,24 +80,20 @@ export function ImageBase64Tool({ onBack }: { onBack: () => void }) {
   const copyBase64 = async () => {
     if (!base64) return
     try {
-      await navigator.clipboard.writeText(base64)
+      await writeClipboardText(base64)
       showNotice('Base64 已复制到剪贴板。', 'success')
     } catch {
       showNotice('复制失败，请手动复制。', 'error')
     }
   }
 
-  const downloadImage = () => {
+  const downloadImage = async () => {
     const { payload, mimeType } = base64ToDataUrl(base64)
     if (!isValidBase64(payload)) return
     const blob = base64ToBlob(payload, mimeType)
     const extension = mimeType.split('/')[1] || 'jpg'
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `lstar-image.${extension === 'jpeg' ? 'jpg' : extension}`
-    link.click()
-    URL.revokeObjectURL(url)
+    const saved = await saveBlob(blob, `lstar-image.${extension === 'jpeg' ? 'jpg' : extension}`)
+    if (!saved) showNotice('已取消保存图片。', 'error')
   }
 
   const clearAll = () => {
@@ -140,7 +138,7 @@ export function ImageBase64Tool({ onBack }: { onBack: () => void }) {
             <button className="primary-button" type="button" onClick={convertBase64}><Upload size={17} />生成图片</button>
             <button className="secondary-button" type="button" onClick={copyBase64} disabled={!base64}><Clipboard size={16} />复制</button>
           </div>
-          {resultPreview && <div className="result-area"><button className="preview-image-button" type="button" onClick={() => setIsViewerOpen(true)} aria-label="在线查看大图"><img src={resultPreview} alt="由 Base64 生成的图片" /><span><Maximize2 size={16} />查看大图</span></button><div><span><Check size={16} />转换成功</span><button className="download-button" type="button" onClick={downloadImage}><Download size={16} />下载图片</button></div></div>}
+          {resultPreview && <div className="result-area"><button className="preview-image-button" type="button" onClick={() => setIsViewerOpen(true)} aria-label="在线查看大图"><img src={resultPreview} alt="由 Base64 生成的图片" /><span><Maximize2 size={16} />查看大图</span></button><div><span><Check size={16} />转换成功</span><button className="download-button" type="button" onClick={() => void downloadImage()}><Download size={16} />下载图片</button></div></div>}
         </article>
       </div>
 
@@ -156,7 +154,7 @@ export function ImageBase64Tool({ onBack }: { onBack: () => void }) {
         </div>
       </section>
       {notice && <div className={`toast ${notice.type}`} role="status">{notice.text}</div>}
-      {isViewerOpen && resultPreview && <div className="image-viewer" role="dialog" aria-modal="true" aria-label="图片大图预览" onMouseDown={() => setIsViewerOpen(false)}><div className="image-viewer-content" onMouseDown={(event) => event.stopPropagation()}><div className="image-viewer-header"><span>图片大图预览</span><button type="button" onClick={() => setIsViewerOpen(false)} aria-label="关闭大图预览"><X size={20} /></button></div><img src={resultPreview} alt="由 Base64 生成的大图" /><button className="download-button viewer-download" type="button" onClick={downloadImage}><Download size={16} />下载图片</button></div></div>}
+      {isViewerOpen && resultPreview && <div className="image-viewer" role="dialog" aria-modal="true" aria-label="图片大图预览" onMouseDown={() => setIsViewerOpen(false)}><div className="image-viewer-content" onMouseDown={(event) => event.stopPropagation()}><div className="image-viewer-header"><span>图片大图预览</span><button type="button" onClick={() => setIsViewerOpen(false)} aria-label="关闭大图预览"><X size={20} /></button></div><img src={resultPreview} alt="由 Base64 生成的大图" /><button className="download-button viewer-download" type="button" onClick={() => void downloadImage()}><Download size={16} />下载图片</button></div></div>}
     </section>
   )
 }

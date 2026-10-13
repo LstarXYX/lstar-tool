@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Clipboard, Link2, RotateCcw } from 'lucide-react'
+import { writeClipboardText } from '../../platform/clipboard'
 import { decodeUrlText, encodeUrlText } from './utils'
 
 export function UrlCodecTool({ onBack }: { onBack: () => void }) {
@@ -14,7 +15,7 @@ export function UrlCodecTool({ onBack }: { onBack: () => void }) {
   }
   const copy = async () => {
     if (!output) return
-    try { await navigator.clipboard.writeText(output); setMessage('结果已复制到剪贴板。') } catch { setMessage('复制失败，请手动复制。') }
+    try { await writeClipboardText(output); setMessage('结果已复制到剪贴板。') } catch { setMessage('复制失败，请手动复制。') }
   }
   return <section className="simple-tool-workspace" aria-label="URL 编码解码工具">
     <div className="tool-intro"><div><button className="back-button" type="button" onClick={onBack}>← 返回工具箱</button><span className="eyebrow">URL CODEC</span><h1>URL 编码解码</h1><p>将 URL、查询参数或任意文本进行百分号编码与解码，所有内容仅在当前浏览器中处理。</p></div></div>

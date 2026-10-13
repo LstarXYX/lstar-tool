@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Check, Clipboard, History, KeyRound, RefreshCw, Save, Trash2 } from 'lucide-react'
 import { characterGroups, createPasswords, getPasswordStrength, uniqueCharacters, type CharacterGroup } from './utils'
+import { writeClipboardText } from '../../platform/clipboard'
 
 type SavedPassword = { id: string; value: string; savedAt: string }
 
@@ -57,7 +58,7 @@ export function PasswordGeneratorTool({ onBack }: { onBack: () => void }) {
   }
 
   const copy = async (password: string, id: string) => {
-    try { await navigator.clipboard.writeText(password); setCopied(id); window.setTimeout(() => setCopied(''), 1500) } catch { setMessage('复制失败，请手动复制密码。') }
+    try { await writeClipboardText(password); setCopied(id); window.setTimeout(() => setCopied(''), 1500) } catch { setMessage('复制失败，请手动复制密码。') }
   }
 
   const save = (password: string) => {

@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import { Check, Clipboard, Download, Link2, QrCode, RefreshCw } from 'lucide-react'
+import { writeClipboardText } from '../../platform/clipboard'
+import { saveBlob } from '../../platform/files'
+
+const dataUrlToBlob = (dataUrl: string) => {
+  const [header, payload] = dataUrl.split(',', 2)
+  const mimeType = header.match(/^data:([^;]+)/)?.[1] ?? 'image/png'
+  const binary = window.atob(payload ?? '')
+  return new Blob([Uint8Array.from(binary, (character) => character.charCodeAt(0))], { type: mimeType })
+}
 
 export function QrCodeTool({ onBack }: { onBack: () => void }) {
   const [content, setContent] = useState('https://tool.lstarr.xyz/')
@@ -23,15 +32,12 @@ export function QrCodeTool({ onBack }: { onBack: () => void }) {
     setImageUrl('')
     if (!value.trim()) setError('')
   }
-  const download = () => {
+  const download = async () => {
     if (!imageUrl) return
-    const link = document.createElement('a')
-    link.href = imageUrl
-    link.download = 'lstar-qrcode.png'
-    link.click()
+    await saveBlob(dataUrlToBlob(imageUrl), 'lstar-qrcode.png')
   }
   const copyContent = async () => {
-    try { await navigator.clipboard.writeText(content); setCopied(true); window.setTimeout(() => setCopied(false), 1500) } catch { setError('复制失败，请手动复制内容。') }
+    try { await writeClipboardText(content); setCopied(true); window.setTimeout(() => setCopied(false), 1500) } catch { setError('复制失败，请手动复制内容。') }
   }
 
   const visibleError = error || (!content.trim() ? '请输入需要生成二维码的内容。' : '')
@@ -39,7 +45,7 @@ export function QrCodeTool({ onBack }: { onBack: () => void }) {
     <div className="tool-intro"><div><button className="back-button" type="button" onClick={onBack}>← 返回工具箱</button><span className="eyebrow">QR CODE GENERATOR</span><h1>二维码生成工具</h1><p>为文字、网址和公开媒体链接生成可下载的二维码。处理过程全部在当前浏览器完成。</p></div><button className="text-button" type="button" onClick={() => changeContent('')}><RefreshCw size={16} />清空内容</button></div>
     <div className="qrcode-layout">
       <article className="qrcode-input-card"><div className="simple-tool-heading"><span className="step-number">01</span><div><h2>输入内容</h2><p>文字、网址或公开媒体链接都会按原样写入二维码。</p></div></div><label className="qrcode-content-label" htmlFor="qrcode-content">文字或链接<textarea id="qrcode-content" value={content} onChange={(event) => changeContent(event.target.value)} placeholder="输入文字、网址、联系方式或公开媒体链接" spellCheck="false" /></label><p className="qrcode-hint"><Link2 size={15} />图片和视频请粘贴可公开访问的链接，扫码后会直接打开该链接。</p><p className="qrcode-limitation">二维码容量远小于普通图片或视频。本站不上传文件，因此本地媒体文件不能被其他扫码设备访问。</p></article>
-      <article className="qrcode-result-card"><div className="simple-tool-heading"><span className="step-number">02</span><div><h2>二维码预览</h2><p>生成后可保存为 PNG 图片。</p></div></div>{imageUrl && content.trim() ? <><div className="qrcode-image-wrap"><img src={imageUrl} alt="生成的二维码" /></div><div className="qrcode-actions"><button className="primary-button" type="button" onClick={download}><Download size={17} />下载 PNG</button><button className="secondary-button" type="button" onClick={copyContent}>{copied ? <Check size={16} /> : <Clipboard size={16} />}{copied ? '已复制' : '复制内容'}</button></div></> : <div className="qrcode-empty"><QrCode size={42} /><p>{visibleError || '输入内容后将在这里生成二维码。'}</p></div>}{error && imageUrl && <p className="simple-message error" role="alert">{error}</p>}</article>
+      <article className="qrcode-result-card"><div className="simple-tool-heading"><span className="step-number">02</span><div><h2>二维码预览</h2><p>生成后可保存为 PNG 图片。</p></div></div>{imageUrl && content.trim() ? <><div className="qrcode-image-wrap"><img src={imageUrl} alt="生成的二维码" /></div><div className="qrcode-actions"><button className="primary-button" type="button" onClick={() => void download()}><Download size={17} />下载 PNG</button><button className="secondary-button" type="button" onClick={copyContent}>{copied ? <Check size={16} /> : <Clipboard size={16} />}{copied ? '已复制' : '复制内容'}</button></div></> : <div className="qrcode-empty"><QrCode size={42} /><p>{visibleError || '输入内容后将在这里生成二维码。'}</p></div>}{error && imageUrl && <p className="simple-message error" role="alert">{error}</p>}</article>
     </div>
     <section className="tool-seo-content"><h2>在线二维码生成器</h2><p>二维码适合承载短文本、网址、联系方式和其他简短数据。输入内容会直接编码，生成和下载都只在你的浏览器中进行，无需注册。</p><h2>媒体二维码说明</h2><div className="faq-grid"><article><h3>能把图片直接放进二维码吗？</h3><p>不能用于普通图片。二维码最大只能容纳约数 KB 数据，无法承载常见图片；请把图片上传到可公开访问的位置，再把链接生成二维码。</p></article><article><h3>视频二维码如何使用？</h3><p>视频文件远超二维码容量。提供一个公开的视频页或视频文件链接，扫码设备即可通过二维码打开该链接。</p></article><article><h3>内容会上传或保存吗？</h3><p>不会。生成所需的文字或链接仅在当前浏览器中处理，刷新或关闭页面后不会由本站保留。</p></article></div></section>
   </section>

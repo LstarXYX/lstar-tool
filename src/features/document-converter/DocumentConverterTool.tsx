@@ -1,13 +1,13 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { FileText, FileUp, RefreshCw, Upload } from 'lucide-react'
 import { documentConversions, type ConversionDefinition, type DocumentFormat } from './converters'
+import { saveBlob } from '../../platform/files'
 
 const sourceFormats: Array<{ format: Extract<DocumentFormat, 'markdown' | 'docx'>; label: string; description: string }> = [
   { format: 'markdown', label: 'Markdown 文件', description: '选择 .md 文档' },
   { format: 'docx', label: 'Word 文件', description: '选择 .docx 文档' },
 ]
 const formatLabels: Record<DocumentFormat, string> = { markdown: 'Markdown', docx: 'Word', pdf: 'PDF', html: 'HTML' }
-const download = (blob: Blob, filename: string) => { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = filename; link.click(); URL.revokeObjectURL(url) }
 
 export function DocumentConverterTool({ onBack }: { onBack: () => void }) {
   const [sourceFormat, setSourceFormat] = useState<Extract<DocumentFormat, 'markdown' | 'docx'>>('markdown')
@@ -31,7 +31,7 @@ export function DocumentConverterTool({ onBack }: { onBack: () => void }) {
     if (!conversion.available || !conversion.run) return
     if (!file) { setMessage(`请先上传 ${sourceFormat === 'markdown' ? 'Markdown' : 'Word'} 文件。`); return }
     setWorking(true); setMessage('')
-    try { const output = await conversion.run(file); download(output.blob, output.filename); setMessage('转换完成，文件已开始下载。') } catch (error) { setMessage(error instanceof Error ? `转换失败：${error.message}` : '转换失败，请重试。') } finally { setWorking(false) }
+    try { const output = await conversion.run(file); setMessage(await saveBlob(output.blob, output.filename) ? '转换完成，文件已保存。' : '已取消保存文件。') } catch (error) { setMessage(error instanceof Error ? `转换失败：${error.message}` : '转换失败，请重试。') } finally { setWorking(false) }
   }
 
   return <section className="document-workspace" aria-label="文件转换工具"><div className="tool-intro"><div><button className="back-button" type="button" onClick={onBack}>← 返回工具箱</button><span className="eyebrow">DOCUMENT CONVERTER</span><h1>文件转换</h1><p>上传文件，选择目标格式后即可开始转换。</p></div><button className="text-button" type="button" onClick={clearFile}><RefreshCw size={16} />清空文件</button></div>

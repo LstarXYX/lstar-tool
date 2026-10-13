@@ -12,6 +12,8 @@ import { PasswordGeneratorTool } from './features/password-generator/PasswordGen
 import { CoordinateSelectorTool } from './features/coordinate-selector/CoordinateSelectorTool'
 import { pageMetadata } from './data/site'
 import { usePageMetadata } from './usePageMetadata'
+import { openExternalLink } from './platform/externalLink'
+import { isDesktopApp } from './platform/runtime'
 
 const OcrTool = lazy(async () => ({ default: (await import('./features/ocr/OcrTool')).OcrTool }))
 const DocumentConverterTool = lazy(async () => ({ default: (await import('./features/document-converter/DocumentConverterTool')).DocumentConverterTool }))
@@ -39,13 +41,14 @@ const routeByView: Record<View, string> = {
 }
 
 const getDeploymentBase = () => {
+  if (isDesktopApp()) return ''
   const pathname = window.location.pathname.endsWith('/') ? window.location.pathname : `${window.location.pathname}/`
   const currentRoute = Object.values(routeByView).sort((left, right) => right.length - left.length).find((route) => route && pathname.endsWith(route))
   return currentRoute ? pathname.slice(0, -currentRoute.length) : pathname
 }
 
 const getViewFromLocation = (): View => {
-  const path = window.location.pathname.replace(/\/+$/, '')
+  const path = (isDesktopApp() ? window.location.hash.replace(/^#/, '') : window.location.pathname).replace(/\/+$/, '')
   if (path.endsWith('/tools/image-base64')) return 'image-base64'
   if (path.endsWith('/tools/coordinate-selector')) return 'coordinate-selector'
   if (path.endsWith('/tools/json-formatter')) return 'json'
@@ -61,7 +64,7 @@ const getViewFromLocation = (): View => {
   return 'home'
 }
 
-const getPathForView = (view: View) => `${getDeploymentBase()}${routeByView[view]}`
+const getPathForView = (view: View) => isDesktopApp() ? `#/${routeByView[view]}` : `${getDeploymentBase()}${routeByView[view]}`
 
 function AppLink({ view, children, className, onClick }: { view: View; children: ReactNode; className?: string; onClick?: () => void }) {
   return <a className={className} href={getPathForView(view)} onClick={(event) => { event.preventDefault(); onClick?.() }}>{children}</a>
@@ -114,12 +117,17 @@ function App() {
   useEffect(() => {
     const handlePopState = () => setView(getViewFromLocation())
     window.addEventListener('popstate', handlePopState)
-    return () => window.removeEventListener('popstate', handlePopState)
+    window.addEventListener('hashchange', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+      window.removeEventListener('hashchange', handlePopState)
+    }
   }, [])
 
   const navigate = (nextView: View, scroll = true) => {
     const nextPath = getPathForView(nextView)
-    if (window.location.pathname !== nextPath) window.history.pushState({}, '', nextPath)
+    const currentPath = isDesktopApp() ? window.location.hash : window.location.pathname
+    if (currentPath !== nextPath) window.history.pushState({}, '', nextPath)
     setView(nextView)
     if (scroll) window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -144,7 +152,7 @@ function App() {
       <header className="site-header">
         <button className="brand" type="button" onClick={() => navigate('home')} aria-label="返回首页"><span className="brand-mark"><Sparkles size={18} /></span><span>Lstar <b>Tools</b></span></button>
         <nav aria-label="主导航"><AppLink className={view === 'toolbox' ? 'active' : ''} view="toolbox" onClick={showToolbox}>工具箱</AppLink><a href={`${getPathForView('home')}#about`} onClick={(event) => { event.preventDefault(); showAbout() }}>关于我们</a></nav>
-        <a className="github-link" href="https://github.com/LstarXYX/lstar-tool" target="_blank" rel="noreferrer"><Code2 size={17} />GitHub</a>
+        <a className="github-link" href="https://github.com/LstarXYX/lstar-tool" target="_blank" rel="noreferrer" onClick={(event) => { event.preventDefault(); void openExternalLink('https://github.com/LstarXYX/lstar-tool') }}><Code2 size={17} />GitHub</a>
       </header>
 
       <main>
