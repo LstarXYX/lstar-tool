@@ -15,6 +15,7 @@
 - [**二维码生成工具**](http://tool.lstarr.xyz/tools/qrcode/)：为文字、网址和公开的图片或视频链接生成并下载 PNG 二维码。二维码无法容纳普通媒体文件，因此媒体需先托管在可公开访问的位置。
 - [**颜色取色与转换**](http://tool.lstarr.xyz/tools/color/)：通过系统取色盘或输入代码选择颜色，实时同步 HEX、RGB、HSL、HSV、HWB 和透明度。
 - [**JSON 格式化**](http://tool.lstarr.xyz/tools/json-formatter/)：输入 JSON 后查看可折叠的树状节点；支持节点值编辑并回写到源文本，以及格式化、紧凑、转义、移除转义、全部折叠与展开。
+- [**文本格式化**](http://tool.lstarr.xyz/tools/text-formatter/)：将实际换行转换为可复制的 `\n` 文本，适合粘贴至提示词、配置和代码字符串；也可还原换行。
 - [**URL 编码解码**](http://tool.lstarr.xyz/tools/url-codec/)：在浏览器本地对 URL、查询参数及任意文本进行百分号编码或解码，解码时兼容查询字符串中的加号空格。
 - [**MD5 加密**](http://tool.lstarr.xyz/tools/md5/)：实时生成文本的 32 位、16 位及大小写四种 MD5 摘要；也可拖拽或选择文件，在浏览器本地分块计算标准 32 位小写 MD5。
 - [**时间戳转换**](http://tool.lstarr.xyz/tools/timestamp/)：在秒级或默认毫秒级时间戳与年月日时分秒之间双向转换，支持复制标准、斜杠、中文、ISO 8601 等日期格式。

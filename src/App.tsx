@@ -10,6 +10,7 @@ import { QrCodeTool } from './features/qrcode/QrCodeTool'
 import { ColorTool } from './features/color/ColorTool'
 import { PasswordGeneratorTool } from './features/password-generator/PasswordGeneratorTool'
 import { CoordinateSelectorTool } from './features/coordinate-selector/CoordinateSelectorTool'
+import { TextFormatterTool } from './features/text-formatter/TextFormatterTool'
 import { pageMetadata } from './data/site'
 import { usePageMetadata } from './usePageMetadata'
 import { openExternalLink } from './platform/externalLink'
@@ -18,7 +19,7 @@ import { isDesktopApp } from './platform/runtime'
 const OcrTool = lazy(async () => ({ default: (await import('./features/ocr/OcrTool')).OcrTool }))
 const DocumentConverterTool = lazy(async () => ({ default: (await import('./features/document-converter/DocumentConverterTool')).DocumentConverterTool }))
 
-type View = 'home' | 'toolbox' | 'image-base64' | 'coordinate-selector' | 'json' | 'url-codec' | 'md5' | 'timestamp' | 'qrcode' | 'color' | 'ocr' | 'document-converter' | 'password-generator'
+type View = 'home' | 'toolbox' | 'image-base64' | 'coordinate-selector' | 'json' | 'text-formatter' | 'url-codec' | 'md5' | 'timestamp' | 'qrcode' | 'color' | 'ocr' | 'document-converter' | 'password-generator'
 type Category = '全部' | ToolDefinition['category'] | '我的收藏'
 
 const categories: Category[] = ['全部', '图片处理', '文件转换', '编码/解码', '开发辅助', '效率工具', '我的收藏']
@@ -30,6 +31,7 @@ const routeByView: Record<View, string> = {
   'image-base64': 'tools/image-base64/',
   'coordinate-selector': 'tools/coordinate-selector/',
   json: 'tools/json-formatter/',
+  'text-formatter': 'tools/text-formatter/',
   'url-codec': 'tools/url-codec/',
   md5: 'tools/md5/',
   timestamp: 'tools/timestamp/',
@@ -52,6 +54,7 @@ const getViewFromLocation = (): View => {
   if (path.endsWith('/tools/image-base64')) return 'image-base64'
   if (path.endsWith('/tools/coordinate-selector')) return 'coordinate-selector'
   if (path.endsWith('/tools/json-formatter')) return 'json'
+  if (path.endsWith('/tools/text-formatter')) return 'text-formatter'
   if (path.endsWith('/tools/url-codec')) return 'url-codec'
   if (path.endsWith('/tools/md5')) return 'md5'
   if (path.endsWith('/tools/timestamp')) return 'timestamp'
@@ -74,6 +77,7 @@ const toolViewById: Record<string, View> = {
   'image-base64': 'image-base64',
   'coordinate-selector': 'coordinate-selector',
   json: 'json',
+  'text-formatter': 'text-formatter',
   'url-codec': 'url-codec',
   md5: 'md5',
   timestamp: 'timestamp',
@@ -133,7 +137,7 @@ function App() {
   }
 
   const openTool = (id: string) => {
-    if (id === 'image-base64' || id === 'coordinate-selector' || id === 'json' || id === 'url-codec' || id === 'md5' || id === 'timestamp' || id === 'qrcode' || id === 'color' || id === 'ocr' || id === 'document-converter' || id === 'password-generator') {
+    if (id === 'image-base64' || id === 'coordinate-selector' || id === 'json' || id === 'text-formatter' || id === 'url-codec' || id === 'md5' || id === 'timestamp' || id === 'qrcode' || id === 'color' || id === 'ocr' || id === 'document-converter' || id === 'password-generator') {
       navigate(id)
     }
   }
@@ -159,6 +163,7 @@ function App() {
         {view === 'image-base64' && <ImageBase64Tool onBack={showToolbox} />}
         {view === 'coordinate-selector' && <CoordinateSelectorTool onBack={showToolbox} />}
         {view === 'json' && <JsonFormatterTool onBack={showToolbox} />}
+        {view === 'text-formatter' && <TextFormatterTool onBack={showToolbox} />}
         {view === 'url-codec' && <UrlCodecTool onBack={showToolbox} />}
         {view === 'md5' && <Md5Tool onBack={showToolbox} />}
         {view === 'timestamp' && <TimestampTool onBack={showToolbox} />}

@@ -53,8 +53,8 @@ export const pageMetadata = {
   },
   toolbox: {
     title: '开发者工具箱 · Lstar Tools',
-    description: '浏览 Lstar Tools 的本地在线工具：图片 OCR、Markdown 与 Word 转换、图片与 Base64 互转、二维码、颜色转换、JSON 格式化等。',
-    keywords: '开发者工具箱,在线工具,图片OCR,PaddleOCR,Markdown转Word,Word转Markdown,二维码生成,颜色转换,JSON格式化',
+    description: '浏览 Lstar Tools 的本地在线工具：文本格式化、图片 OCR、Markdown 与 Word 转换、图片与 Base64 互转、二维码、颜色转换、JSON 格式化等。',
+    keywords: '开发者工具箱,在线工具,文本格式化,图片OCR,PaddleOCR,Markdown转Word,Word转Markdown,二维码生成,颜色转换,JSON格式化',
     canonical: `${siteUrl}tools/`,
     structuredData: {
       '@context': 'https://schema.org',
@@ -86,6 +86,13 @@ export const pageMetadata = {
     keywords: 'JSON格式化,JSON在线解析,JSON压缩,JSON转义,JSON编辑器',
     canonical: `${siteUrl}tools/json-formatter/`,
     structuredData: applicationSchema('JSON 格式化与结构编辑 · Lstar Tools', `${siteUrl}tools/json-formatter/`, '在浏览器本地格式化、压缩、转义和结构化编辑 JSON。', ['JSON 格式化', 'JSON 压缩', 'JSON 转义', '树状结构编辑']),
+  },
+  'text-formatter': {
+    title: '文本格式化 · Lstar Tools',
+    description: '免费的在线文本格式化工具，将实际换行转换为可复制的 \\n 文本，适合提示词、配置与代码字符串，全程在浏览器本地处理。',
+    keywords: '文本格式化,换行转义,换行转\\n,多行转单行,提示词格式化,文本转义',
+    canonical: `${siteUrl}tools/text-formatter/`,
+    structuredData: applicationSchema('文本格式化 · Lstar Tools', `${siteUrl}tools/text-formatter/`, '在浏览器本地将实际换行转换为可复制的 \\n 文本，或还原换行。', ['换行转义', '换行还原', '多行文本转单行', '本地处理']),
   },
   'url-codec': {
     title: 'URL 编码解码 · Lstar Tools',

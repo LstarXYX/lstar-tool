@@ -14,6 +14,7 @@
 - [二维码生成工具]({{SITE_URL}}tools/qrcode/)：为文字、网址和公开图片或视频链接生成可下载的 PNG 二维码；二维码无法直接容纳普通媒体文件。
 - [颜色取色与转换]({{SITE_URL}}tools/color/)：使用取色盘或颜色代码，在 HEX、RGB、HSL、HSV、HWB 与透明度之间同步转换。
 - [JSON 格式化与结构编辑]({{SITE_URL}}tools/json-formatter/)：格式化、压缩、转义、移除转义以及树状结构编辑 JSON。
+- [文本格式化]({{SITE_URL}}tools/text-formatter/)：将实际换行转换为可复制的 `\n` 文本，或将换行转义还原为多行内容。
 - [URL 编码解码]({{SITE_URL}}tools/url-codec/)：编码或解码 URL、查询参数与文本，支持中文和特殊字符。
 - [MD5 加密]({{SITE_URL}}tools/md5/)：生成文本的 32 位、16 位及大小写 MD5 摘要，并支持本地文件 MD5 计算。
 - [时间戳转换]({{SITE_URL}}tools/timestamp/)：在秒级、毫秒级时间戳与日期时间格式之间转换。
