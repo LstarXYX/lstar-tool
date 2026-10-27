@@ -21,7 +21,7 @@ export const tools: ToolDefinition[] = [
   },
   { id: 'coordinate-selector', name: '坐标框选', description: '在图片上框选多个矩形区域并复制原图坐标', icon: ScanLine, category: '图片处理', available: true },
   { id: 'json', name: 'JSON 格式化', description: '整理、校验、编辑与查看 JSON 结构', icon: Braces, category: '开发辅助', available: true },
-  { id: 'text-formatter', name: '文本格式化', description: '将多行文本转换为带 \\n 的可复制文本', icon: WrapText, category: '开发辅助', available: true },
+  { id: 'text-formatter', name: '文本格式化', description: '转义双引号、换行和反斜杠等常用字符', icon: WrapText, category: '开发辅助', available: true },
   { id: 'url-codec', name: 'URL 编码解码', description: '快速编码或还原 URL 与查询参数文本', icon: Link2, category: '编码/解码', available: true },
   { id: 'md5', name: 'MD5 加密', description: '生成 32 位、16 位及大小写 MD5 摘要', icon: Fingerprint, category: '编码/解码', available: true },
   { id: 'timestamp', name: '时间戳转换', description: '在时间戳与日期时间格式之间快速转换', icon: Clock3, category: '开发辅助', available: true },

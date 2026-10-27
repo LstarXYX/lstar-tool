@@ -89,10 +89,10 @@ export const pageMetadata = {
   },
   'text-formatter': {
     title: '文本格式化 · Lstar Tools',
-    description: '免费的在线文本格式化工具，将实际换行转换为可复制的 \\n 文本，适合提示词、配置与代码字符串，全程在浏览器本地处理。',
-    keywords: '文本格式化,换行转义,换行转\\n,多行转单行,提示词格式化,文本转义',
+    description: '免费的在线文本转义工具，支持双引号、反斜杠、换行和制表符转义，适合提示词、配置与代码字符串，全程在浏览器本地处理。',
+    keywords: '文本格式化,文本转义,双引号转义,换行转\\n,反斜杠转义,提示词格式化',
     canonical: `${siteUrl}tools/text-formatter/`,
-    structuredData: applicationSchema('文本格式化 · Lstar Tools', `${siteUrl}tools/text-formatter/`, '在浏览器本地将实际换行转换为可复制的 \\n 文本，或还原换行。', ['换行转义', '换行还原', '多行文本转单行', '本地处理']),
+    structuredData: applicationSchema('文本格式化 · Lstar Tools', `${siteUrl}tools/text-formatter/`, '在浏览器本地转义双引号、反斜杠、换行和制表符，或还原常用转义。', ['双引号转义', '换行转义', '反斜杠转义', '转义还原', '本地处理']),
   },
   'url-codec': {
     title: 'URL 编码解码 · Lstar Tools',

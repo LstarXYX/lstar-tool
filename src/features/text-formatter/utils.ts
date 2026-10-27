@@ -1,5 +1,12 @@
-/** Converts physical line endings into visible, copyable newline escapes. */
-export const escapeLineBreaks = (value: string) => value.replace(/\r\n|\r|\n/g, '\\n')
+/** Escapes common text characters for use inside a quoted string. */
+export const escapeText = (value: string) => value
+  .replace(/\\/g, '\\\\')
+  .replace(/"/g, '\\"')
+  .replace(/\r\n|\r|\n/g, '\\n')
+  .replace(/\t/g, '\\t')
 
-/** Restores newline escape sequences without changing other backslash sequences. */
-export const restoreLineBreaks = (value: string) => value.replace(/\\r\\n|\\n|\\r/g, '\n')
+/** Restores the text escapes produced by escapeText and preserves unknown escapes. */
+export const restoreTextEscapes = (value: string) => value.replace(/\\(["\\nrt])/g, (_match, character: string) => {
+  const characters: Record<string, string> = { '"': '"', '\\': '\\', n: '\n', r: '\r', t: '\t' }
+  return characters[character]
+})
