@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type DragEvent, type PointerEvent, type WheelEvent } from 'react'
 import { Check, Clipboard, Crosshair, ImageUp, Maximize2, Minimize2, MousePointer2, RefreshCw, Trash2, ZoomIn, ZoomOut } from 'lucide-react'
-import { clamp, createRectBox, formatBoxes, rectToStyle, type AnnotationBox, type Point, type RectBox } from './utils'
+import { clamp, createRectBox, formatBoxes, parseBoxes, rectToStyle, type AnnotationBox, type Point, type RectBox } from './utils'
 import { writeClipboardText } from '../../platform/clipboard'
 
 type ImageInfo = { url: string; name: string; width: number; height: number }
@@ -16,6 +16,8 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   const canvasCardRef = useRef<HTMLElement>(null)
   const [image, setImage] = useState<ImageInfo | null>(null)
   const [boxes, setBoxes] = useState<AnnotationBox[]>([])
+  const [jsonData, setJsonData] = useState('[]')
+  const [jsonError, setJsonError] = useState<string | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [scale, setScale] = useState(1)
   const [pan, setPan] = useState({ x: 0, y: 0 })
@@ -81,6 +83,8 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   const resetCanvas = (nextImage: ImageInfo) => {
     setImage(nextImage)
     setBoxes([])
+    setJsonData('[]')
+    setJsonError(null)
     setSelectedIndex(null)
     setDraft(null)
     setScale(1)
@@ -247,11 +251,26 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
     } catch { showNotice('复制失败，请手动复制。', 'error') }
   }
 
-  const clearBoxes = () => { setBoxes([]); setSelectedIndex(null) }
+  const updateJsonData = (value: string) => {
+    setJsonData(value)
+    if (!image) return
+    try {
+      const nextBoxes = parseBoxes(value, image.width, image.height)
+      setJsonError(null)
+      setBoxes(nextBoxes)
+      setSelectedIndex((current) => nextBoxes.length === 0 ? null : current === null || current < nextBoxes.length ? current : nextBoxes.length - 1)
+    } catch (error) {
+      setJsonError(error instanceof Error ? error.message : '坐标数据无法读取。')
+    }
+  }
+
+  const clearBoxes = () => { setBoxes([]); setJsonData('[]'); setJsonError(null); setSelectedIndex(null) }
   const clearImage = () => {
     if (document.fullscreenElement === canvasCardRef.current) void document.exitFullscreen()
     setImage(null)
     setBoxes([])
+    setJsonData('[]')
+    setJsonError(null)
     setSelectedIndex(null)
     setDraft(null)
     setPanning(null)
@@ -297,9 +316,10 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
       <aside className="coordinate-output-card">
         <div className="coordinate-card-heading"><div><h2>框选坐标</h2><p>{boxes.length ? `共 ${boxes.length} 个矩形` : '尚未框选区域'}</p></div><Crosshair size={20} /></div>
         <div className="coordinate-box-list">{boxes.length ? boxes.map((box, index) => <div className={`coordinate-box-row ${selectedIndex === index ? 'selected' : ''}`} key={`${box.box.join('-')}-${index}`}><label className="coordinate-name-field"><span>名称</span><input value={box.name} onChange={(event) => updateBoxName(index, event.target.value)} onFocus={() => setSelectedIndex(index)} aria-label={`矩形 ${index + 1} 的名称`} /></label><button className="coordinate-box-row-main" type="button" onClick={() => setSelectedIndex(index)}><b>{box.name.trim() || 'object'}_{boxes.slice(0, index + 1).filter((item) => (item.name.trim() || 'object') === (box.name.trim() || 'object')).length}</b><code>[{box.box.join(', ')}]</code></button><button className="coordinate-box-delete" type="button" onClick={() => removeBox(index)} aria-label={`删除矩形 ${index + 1}`}><Trash2 size={15} /></button></div>) : <div className="coordinate-empty"><Crosshair size={26} /><p>在左侧图片上拖动鼠标，即可创建矩形框。</p></div>}</div>
-        <textarea className="coordinate-json" value={formatBoxes(boxes)} readOnly aria-label="完整坐标数据" />
+        <label className="coordinate-json-field"><span>完整坐标数据</span><textarea className="coordinate-json" value={jsonError ? jsonData : formatBoxes(boxes)} onChange={(event) => updateJsonData(event.target.value)} spellCheck="false" aria-label="可编辑的完整坐标数据" aria-invalid={Boolean(jsonError)} aria-describedby={jsonError ? 'coordinate-json-error' : undefined} /></label>
+        {jsonError && <p className="coordinate-json-error" id="coordinate-json-error" role="alert">{jsonError}</p>}
         <div className="coordinate-actions"><button className="primary-button" type="button" onClick={copyBoxes} disabled={!boxes.length}><Clipboard size={16} />复制完整数据</button><button className="secondary-button" type="button" onClick={clearBoxes} disabled={!boxes.length}><Trash2 size={16} />清空</button></div>
-        <p className="coordinate-format-note"><Check size={15} />可编辑每个框的名称；ID 会按同名框的顺序自动生成。</p>
+        <p className="coordinate-format-note"><Check size={15} />可直接修改 JSON 中的名称和 bbox；有效数据会立即同步到图片，ID 会按同名框的顺序生成。</p>
       </aside>
     </div>}
     <section className="tool-seo-content coordinate-seo"><h2>图片坐标框选说明</h2><p>选择图片后，左键拖动可建立多个矩形框。坐标使用原图像素，因此即使放大、缩小或中键平移，导出的 bbox 也保持准确。</p><h2>常见问题</h2><div className="faq-grid"><article><h3>坐标格式是什么？</h3><p>完整复制内容是标注对象数组，每项包含名称、按同名顺序生成的 ID，以及 <code>bbox</code> 坐标。</p></article><article><h3>如何删除框选？</h3><p>点击矩形或右侧列表选中后，按 Delete 或 Backspace；也可以点击每项右侧的删除按钮。</p></article><article><h3>图片会上传吗？</h3><p>不会。图片预览、框选与坐标生成均在当前浏览器本地完成。</p></article></div></section>

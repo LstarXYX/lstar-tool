@@ -48,3 +48,32 @@ export const formatBoxes = (boxes: AnnotationBox[]) => {
   })
   return JSON.stringify(annotations, null, 2)
 }
+
+/** Parses the exported JSON back into drawable, original-image pixel boxes. */
+export const parseBoxes = (value: string, imageWidth: number, imageHeight: number): AnnotationBox[] => {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(value)
+  } catch {
+    throw new Error('数据不是有效的 JSON。')
+  }
+
+  if (!Array.isArray(parsed)) throw new Error('坐标数据需要是一个标注数组。')
+
+  return parsed.map((item, index) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) throw new Error(`第 ${index + 1} 项必须是标注对象。`)
+    const annotation = item as Record<string, unknown>
+    if (annotation.type !== undefined && annotation.type !== 'rect') throw new Error(`第 ${index + 1} 项仅支持 rect 矩形标注。`)
+    if (annotation.name !== undefined && typeof annotation.name !== 'string') throw new Error(`第 ${index + 1} 项的 name 必须是文本。`)
+    if (!Array.isArray(annotation.bbox) || annotation.bbox.length !== 4 || !annotation.bbox.every((coordinate) => typeof coordinate === 'number' && Number.isInteger(coordinate))) {
+      throw new Error(`第 ${index + 1} 项的 bbox 必须是 4 个整数坐标。`)
+    }
+
+    const [x1, y1, x2, y2] = annotation.bbox as number[]
+    if (x1 < 0 || y1 < 0 || x2 > imageWidth || y2 > imageHeight || x1 >= x2 || y1 >= y2) {
+      throw new Error(`第 ${index + 1} 项的 bbox 必须位于图片内，且右下坐标大于左上坐标。`)
+    }
+
+    return { type: 'rect', name: annotation.name ?? 'object', box: [x1, y1, x2, y2] }
+  })
+}

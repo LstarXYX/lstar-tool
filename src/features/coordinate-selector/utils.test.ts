@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createRectBox, formatBoxes } from './utils'
+import { createRectBox, formatBoxes, parseBoxes } from './utils'
 
 describe('createRectBox', () => {
   it('normalizes reverse drags into original-image coordinates', () => {
@@ -22,5 +22,22 @@ describe('formatBoxes', () => {
 
   it('uses object when a name is empty', () => {
     expect(formatBoxes([{ type: 'rect', name: '  ', box: [1, 2, 3, 4] }])).toContain('"id": "object_1"')
+  })
+})
+
+describe('parseBoxes', () => {
+  it('converts editable exported JSON into annotation boxes', () => {
+    expect(parseBoxes('[{"type":"rect","name":"car","id":"car_9","bbox":[10,20,80,90]}]', 100, 100)).toEqual([
+      { type: 'rect', name: 'car', box: [10, 20, 80, 90] },
+    ])
+  })
+
+  it('rejects incomplete rectangles and coordinates outside the image', () => {
+    expect(() => parseBoxes('[{"name":"car","bbox":[10,20,10,90]}]', 100, 100)).toThrow('右下坐标大于左上坐标')
+    expect(() => parseBoxes('[{"name":"car","bbox":[10,20,120,90]}]', 100, 100)).toThrow('必须位于图片内')
+  })
+
+  it('reports invalid JSON', () => {
+    expect(() => parseBoxes('{', 100, 100)).toThrow('数据不是有效的 JSON')
   })
 })

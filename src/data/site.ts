@@ -75,10 +75,10 @@ export const pageMetadata = {
   },
   'coordinate-selector': {
     title: '图片坐标框选工具 · Lstar Tools',
-    description: '免费的在线图片坐标框选工具。上传图片后可框选多个矩形区域，支持滚轮缩放、中键平移、快捷键删除和一键复制原图坐标。',
+    description: '免费的在线图片坐标框选工具。上传图片后可框选或编辑 JSON 坐标，图片标注框会实时同步更新。',
     keywords: '图片坐标框选,图片标注,矩形框选,坐标提取,图片框选工具,目标检测标注',
     canonical: `${siteUrl}tools/coordinate-selector/`,
-    structuredData: applicationSchema('图片坐标框选工具 · Lstar Tools', `${siteUrl}tools/coordinate-selector/`, '在浏览器本地框选图片区域，获取多个矩形的原图像素坐标。', ['多矩形框选', '原图像素坐标', '滚轮缩放与中键平移', '快捷键删除', 'JSON 坐标复制']),
+    structuredData: applicationSchema('图片坐标框选工具 · Lstar Tools', `${siteUrl}tools/coordinate-selector/`, '在浏览器本地框选或编辑图片矩形坐标，获取原图像素坐标。', ['多矩形框选', 'JSON 坐标实时编辑', '原图像素坐标', '滚轮缩放与中键平移', '快捷键删除']),
   },
   json: {
     title: 'JSON 格式化与结构编辑 · Lstar Tools',
