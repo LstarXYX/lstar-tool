@@ -32,6 +32,16 @@ describe('parseBoxes', () => {
     ])
   })
 
+  it('preserves decimal coordinates entered manually', () => {
+    expect(parseBoxes('[{"name":"car","bbox":[10.25,20.5,80.75,90.12]}]', 100, 100)).toEqual([
+      { type: 'rect', name: 'car', box: [10.25, 20.5, 80.75, 90.12] },
+    ])
+  })
+
+  it('rejects coordinates with more than two decimal places', () => {
+    expect(() => parseBoxes('[{"name":"car","bbox":[10.125,20,80,90]}]', 100, 100)).toThrow('最多两位小数')
+  })
+
   it('rejects incomplete rectangles and coordinates outside the image', () => {
     expect(() => parseBoxes('[{"name":"car","bbox":[10,20,10,90]}]', 100, 100)).toThrow('右下坐标大于左上坐标')
     expect(() => parseBoxes('[{"name":"car","bbox":[10,20,120,90]}]', 100, 100)).toThrow('必须位于图片内')

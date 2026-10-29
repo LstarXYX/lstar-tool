@@ -13,6 +13,7 @@ export type Point = {
 }
 
 export const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), maximum)
+const hasAtMostTwoDecimalPlaces = (value: number) => Number.isFinite(value) && Math.abs(value * 100 - Math.round(value * 100)) < 1e-8
 
 /**
  * Coordinates are always stored in original-image pixels. `type` is kept as a
@@ -65,8 +66,8 @@ export const parseBoxes = (value: string, imageWidth: number, imageHeight: numbe
     const annotation = item as Record<string, unknown>
     if (annotation.type !== undefined && annotation.type !== 'rect') throw new Error(`第 ${index + 1} 项仅支持 rect 矩形标注。`)
     if (annotation.name !== undefined && typeof annotation.name !== 'string') throw new Error(`第 ${index + 1} 项的 name 必须是文本。`)
-    if (!Array.isArray(annotation.bbox) || annotation.bbox.length !== 4 || !annotation.bbox.every((coordinate) => typeof coordinate === 'number' && Number.isInteger(coordinate))) {
-      throw new Error(`第 ${index + 1} 项的 bbox 必须是 4 个整数坐标。`)
+    if (!Array.isArray(annotation.bbox) || annotation.bbox.length !== 4 || !annotation.bbox.every((coordinate) => typeof coordinate === 'number' && hasAtMostTwoDecimalPlaces(coordinate))) {
+      throw new Error(`第 ${index + 1} 项的 bbox 必须是整数或最多两位小数。`)
     }
 
     const [x1, y1, x2, y2] = annotation.bbox as number[]

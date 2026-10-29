@@ -319,7 +319,7 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
         <label className="coordinate-json-field"><span>完整坐标数据</span><textarea className="coordinate-json" value={jsonError ? jsonData : formatBoxes(boxes)} onChange={(event) => updateJsonData(event.target.value)} spellCheck="false" aria-label="可编辑的完整坐标数据" aria-invalid={Boolean(jsonError)} aria-describedby={jsonError ? 'coordinate-json-error' : undefined} /></label>
         {jsonError && <p className="coordinate-json-error" id="coordinate-json-error" role="alert">{jsonError}</p>}
         <div className="coordinate-actions"><button className="primary-button" type="button" onClick={copyBoxes} disabled={!boxes.length}><Clipboard size={16} />复制完整数据</button><button className="secondary-button" type="button" onClick={clearBoxes} disabled={!boxes.length}><Trash2 size={16} />清空</button></div>
-        <p className="coordinate-format-note"><Check size={15} />可直接修改 JSON 中的名称和 bbox；有效数据会立即同步到图片，ID 会按同名框的顺序生成。</p>
+        <p className="coordinate-format-note"><Check size={15} />可直接修改 JSON 中的名称和 bbox，坐标支持最多两位小数；有效数据会立即同步到图片，ID 会按同名框的顺序生成。</p>
       </aside>
     </div>}
     <section className="tool-seo-content coordinate-seo"><h2>图片坐标框选说明</h2><p>选择图片后，左键拖动可建立多个矩形框。坐标使用原图像素，因此即使放大、缩小或中键平移，导出的 bbox 也保持准确。</p><h2>常见问题</h2><div className="faq-grid"><article><h3>坐标格式是什么？</h3><p>完整复制内容是标注对象数组，每项包含名称、按同名顺序生成的 ID，以及 <code>bbox</code> 坐标。</p></article><article><h3>如何删除框选？</h3><p>点击矩形或右侧列表选中后，按 Delete 或 Backspace；也可以点击每项右侧的删除按钮。</p></article><article><h3>图片会上传吗？</h3><p>不会。图片预览、框选与坐标生成均在当前浏览器本地完成。</p></article></div></section>
