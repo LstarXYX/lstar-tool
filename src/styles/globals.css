@@ -96,3 +96,5 @@ nav button { cursor: pointer; }
 .coordinate-json:focus { border-color: #54a0fa; outline: 0; box-shadow: 0 0 0 3px #74b4ff1f; }
 .coordinate-json[aria-invalid='true'] { border-color: #e6a0a0; background: #fffafb; }
 .coordinate-json-error { margin: 6px 0 -2px; color: #b55d5d; font-size: 11px; line-height: 1.45; }
+.coordinate-canvas-card { position: relative; }
+.coordinate-replace-overlay { position: absolute; z-index: 5; inset: 8px; display: grid; place-content: center; justify-items: center; gap: 7px; border: 2px dashed #2b83e8; border-radius: 13px; color: #226db7; background: #edf7ffeb; pointer-events: none; text-align: center; }.coordinate-replace-overlay span { color: #5c7f9e; font-size: 12px; }.coordinate-replace-overlay svg { color: #287fec; }

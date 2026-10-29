@@ -27,6 +27,7 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
   const [resizingBox, setResizingBox] = useState<{ index: number; start: Point; box: AnnotationBox; handle: ResizeHandle } | null>(null)
   const [notice, setNotice] = useState<Notice>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isReplacingImage, setIsReplacingImage] = useState(false)
 
   const fitImageToViewport = useCallback(() => {
     if (!image || !viewportRef.current) return
@@ -114,10 +115,22 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
     if (file) readFile(file)
   }
 
-  const onDrop = (event: DragEvent<HTMLDivElement>) => {
+  const onDrop = (event: DragEvent<HTMLElement>) => {
     event.preventDefault()
+    setIsReplacingImage(false)
     const file = event.dataTransfer.files?.[0]
     if (file) readFile(file)
+  }
+
+  const onReplacementDragOver = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
+    setIsReplacingImage(true)
+  }
+
+  const onReplacementDragLeave = (event: DragEvent<HTMLElement>) => {
+    const nextTarget = event.relatedTarget
+    if (!nextTarget || !event.currentTarget.contains(nextTarget as Node)) setIsReplacingImage(false)
   }
 
   const pointFromEvent = (event: { clientX: number; clientY: number }): Point | null => {
@@ -302,7 +315,8 @@ export function CoordinateSelectorTool({ onBack }: { onBack: () => void }) {
       <input ref={inputRef} type="file" accept="image/*" onChange={onFileChange} />
       <span className="upload-icon"><ImageUp size={25} /></span><strong>拖拽图片到这里，或点击上传</strong><span>图片只在当前浏览器中读取和处理</span>
     </div> : <div className="coordinate-layout">
-      <article className="coordinate-canvas-card" ref={canvasCardRef}>
+      <article className={`coordinate-canvas-card ${isReplacingImage ? 'is-replacing-image' : ''}`} ref={canvasCardRef} onDragOver={onReplacementDragOver} onDragLeave={onReplacementDragLeave} onDrop={onDrop}>
+        {isReplacingImage && <div className="coordinate-replace-overlay" aria-hidden="true"><ImageUp size={28} /><strong>松开以替换图片</strong><span>当前标注将被清空</span></div>}
         <div className="coordinate-card-heading"><div><h2>{image.name}</h2><p>{image.width} × {image.height} px · 左键框选，中键拖动，滚轮缩放</p></div><div className="coordinate-card-actions"><span>{Math.round(scale * 100)}%</span><button type="button" onClick={toggleFullscreen} aria-label={isFullscreen ? '退出全屏标注' : '进入全屏标注'}>{isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button></div></div>
         <div className={`coordinate-viewport ${panning ? 'is-panning' : ''}`} ref={viewportRef} onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp} onWheel={onWheel} onAuxClick={(event) => event.preventDefault()} onContextMenu={(event) => event.preventDefault()} onDragStart={(event) => event.preventDefault()}>
           <div className="coordinate-stage" style={{ width: image.width, height: image.height, transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}>
